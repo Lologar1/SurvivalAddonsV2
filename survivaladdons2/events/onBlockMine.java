@@ -73,6 +73,9 @@ public class onBlockMine implements Listener {
             }
         } else if(block.getBlockData() instanceof Ageable){
             //Is a crop
+            if(!(((Ageable) block.getBlockData()).getAge() == ((Ageable) block).getMaximumAge())){
+                return;
+            }
             checkQuest("mine", "crops", player, 1);
 
             if(getCustomEnchantments(heldItem).containsKey("bountiful")){
