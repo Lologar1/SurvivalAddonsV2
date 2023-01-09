@@ -110,7 +110,7 @@ public final class SurvivalAddons2 extends JavaPlugin {
         chatChannel = jda.getTextChannelById("1060965324285030523");
         // Plugin startup logic
         jda.addEventListener(new MessageSendEvent());
-
+        plugin.saveDefaultConfig();
         System.out.println("Don't forget to play with showDeathMessages false and keepinventory false!");
         getServer().getPluginManager().registerEvents(new OnInventoryOpen(), this);
         getServer().getPluginManager().registerEvents(new onPlayerJoin(), this);
@@ -140,6 +140,7 @@ public final class SurvivalAddons2 extends JavaPlugin {
         this.getCommand("view").setExecutor(new View());
         this.getCommand("setEffect").setExecutor(new SetEffect());
         this.getCommand("quests").setExecutor(new Quests());
+        this.getCommand("shop").setExecutor(new Shop());
 
         for(Player player : this.getServer().getOnlinePlayers()){
             if(!pdc.has(player, "dust")){
@@ -293,6 +294,8 @@ To add ench :
     public void onDisable() {
         // Plugin shutdown logic
         jda.shutdownNow();
+
+        plugin.saveConfig();
 
         getServer().removeRecipe(new NamespacedKey(this, "shortbow1recipe"));
         getServer().removeRecipe(new NamespacedKey(this, "shortbow2recipe"));

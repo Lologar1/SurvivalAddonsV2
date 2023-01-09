@@ -2,6 +2,8 @@ package mc.analyzers.survivaladdons2.events;
 
 import mc.analyzers.survivaladdons2.quests.Quest;
 import mc.analyzers.survivaladdons2.quests.Quests;
+import mc.analyzers.survivaladdons2.shop.ShopItem;
+import mc.analyzers.survivaladdons2.shop.ShopItems;
 import mc.analyzers.survivaladdons2.tasks.SyncAttributes;
 import mc.analyzers.survivaladdons2.utility.*;
 import org.bukkit.Bukkit;
@@ -31,6 +33,7 @@ import java.util.*;
 
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.dustIcon;
 import static mc.analyzers.survivaladdons2.quests.Quest.checkQuest;
+import static mc.analyzers.survivaladdons2.shop.ShopItem.getByMaterial;
 import static mc.analyzers.survivaladdons2.utility.AttributeUtils.mergeModifiers;
 import static mc.analyzers.survivaladdons2.utility.AttributeUtils.setAttribute;
 import static mc.analyzers.survivaladdons2.utility.customEnchantmentsWrapper.*;
@@ -658,7 +661,7 @@ public class OnInventoryClick implements Listener {
                 case SWEET_BERRIES:
                     //sussyberry
                     name = ChatColor.DARK_AQUA + "Sussy ";
-                    PotionEffectType[] possible = new PotionEffectType[]{PotionEffectType.ABSORPTION, PotionEffectType.DAMAGE_RESISTANCE, PotionEffectType.HERO_OF_THE_VILLAGE, PotionEffectType.FAST_DIGGING, PotionEffectType.WEAKNESS, PotionEffectType.BAD_OMEN, PotionEffectType.WITHER, PotionEffectType.SLOW};
+                    PotionEffectType[] possible = new PotionEffectType[]{PotionEffectType.ABSORPTION, PotionEffectType.DAMAGE_RESISTANCE, PotionEffectType.HERO_OF_THE_VILLAGE, PotionEffectType.FAST_DIGGING, PotionEffectType.WEAKNESS, PotionEffectType.BAD_OMEN, PotionEffectType.WITHER, PotionEffectType.SLOW, PotionEffectType.SATURATION, PotionEffectType.SPEED};
                     PotionEffectType picked = possible[new Random().nextInt(possible.length)];
                     newEffect = new PotionEffect(picked, 6000, 2);
                     player.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "SUSSY! " + ChatColor.GRAY + "Got " + picked.getName().substring(0, 1).toUpperCase() + picked.getName().substring(1));
@@ -798,6 +801,55 @@ public class OnInventoryClick implements Listener {
                 pdc.set(player, "deactivatedWeeklyQuest", picked);
 
                 e.getInventory().setItem(15, weeklyQuest);
+            }
+        }else if(e.getView().getTitle().equals(ChatColor.GRAY + "Shop")){
+            e.setCancelled(true);
+            Inventory shop = e.getClickedInventory();
+            if(!(shop.getItem(e.getSlot()) == null)){
+                if(shop.getType().equals(InventoryType.PLAYER)){
+                    ItemStack sold = e.getCurrentItem();
+                    if(getByMaterial(sold.getType())==null || !getByMaterial(sold.getType()).isCanSell() || pdc.has(sold, "id")){
+                        player.sendMessage(ChatColor.RED + "Can't sell this to the shop!");
+                        return;
+                    }
+                    ShopItem shopItem = getByMaterial(sold.getType());
+                    shop.setItem(e.getSlot(), new ItemStack(Material.AIR));
+                    int price = shopItem.sellItem(sold.getAmount());
+                    pdc.set(player, "dust", String.valueOf(Integer.parseInt(pdc.get(player, "dust")) + price));
+                    player.sendMessage(ChatColor.GREEN + "Sold " + sold.getAmount() + " " + capFirst(shopItem.getActualItem().getType().toString().replace('_', ' ').toLowerCase(Locale.ROOT)) + " for " + ChatColor.RED + price + " " + dustIcon + " dust.");
+                    shop = e.getInventory();
+                }else{
+                    //Bought an item!!!
+                    int qty = 1;
+                    if(e.getClick().equals(ClickType.RIGHT)){
+                        qty = 64;
+                    }
+                    ItemStack clicked = e.getCurrentItem();
+                    ShopItem bought = getByMaterial(clicked.getType());
+                    int price = bought.buyItem(qty);
+                    if(Integer.parseInt(pdc.get(player, "dust")) < price){
+                        player.sendMessage(ChatColor.RED + "Not enough dust!");
+                        bought.sellItem(qty);
+                        return;
+                    }
+                    pdc.set(player, "dust", String.valueOf(Integer.parseInt(pdc.get(player, "dust")) - price));
+                    giveItem(player, bought.getActualItem(), qty);
+                    player.sendMessage(ChatColor.GREEN + "Bought " + qty + " " + capFirst(bought.getActualItem().getType().toString().replace('_', ' ').toLowerCase(Locale.ROOT)) + " for " + ChatColor.RED + price + " " + dustIcon + " dust.");
+                }
+                for(ItemStack addedItem : shop.getContents()){
+                    if(addedItem == null){
+                        continue;
+                    }
+                    addedItem.setAmount(1);
+                    ItemMeta meta = addedItem.getItemMeta();
+                    ArrayList<String> lore = new ArrayList<>();
+                    lore.add(ChatColor.GRAY + "Click to buy for " + ChatColor.RED + getByMaterial(addedItem.getType()).getBiasedPrice() + " " + dustIcon + " dust");
+                    if(!getByMaterial(addedItem.getType()).isCanSell()){
+                        lore.add(ChatColor.RED + "Can't sell back!");
+                    }
+                    meta.setLore(lore);
+                    addedItem.setItemMeta(meta);
+                }
             }
         }
     }

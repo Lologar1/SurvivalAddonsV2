@@ -252,7 +252,7 @@ public class itemList {
         fallenMeta.setDisplayName(ChatColor.YELLOW + "Fallen Star");
         ArrayList<String> fallenLore = new ArrayList<>();
         fallenLore.add(ChatColor.YELLOW + "Modifier");
-        fallenLore.add(ChatColor.GRAY + "Bonus" + ChatColor.AQUA + " magic damage " + ChatColor.GRAY + ": " + ChatColor.WHITE + "1.5");
+        fallenLore.add(ChatColor.GRAY + "Bonus" + ChatColor.AQUA + " magic damage " + ChatColor.GRAY + ": " + ChatColor.WHITE + "1");
         fallenLore.add(ChatColor.GRAY + "You can only apply one modifier per item!");
         fallenMeta.setLore(fallenLore);
         fallen_star.setItemMeta(fallenMeta);

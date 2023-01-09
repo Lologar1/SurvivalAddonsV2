@@ -60,7 +60,7 @@ public class Quests implements CommandExecutor {
         if(weeklyLast + 604800000 <= System.currentTimeMillis()){
             weeklySelect = true;
         }
-        if(dailyLast + 86400000 <= System.currentTimeMillis()){
+        if(dailyLast + 43200000 <= System.currentTimeMillis()){
             dailySelect = true;
         }
         if(hourlyLast + 3600000 <= System.currentTimeMillis()){
@@ -102,7 +102,7 @@ public class Quests implements CommandExecutor {
             }
         }else {
             dailyLore.add(ChatColor.RED + "You already did a quest today!");
-            weeklyLore.add(ChatColor.GRAY + "You can do this quest again in: " +(24 - (((System.currentTimeMillis() - dailyLast)/1000)/60)/60 + " hours."));
+            dailyLore.add(ChatColor.GRAY + "You can do this quest again in: " +(12 - (((System.currentTimeMillis() - dailyLast)/1000)/60)/60 + " hours."));
         }
         dailyMeta.setLore(dailyLore);
         daily.setItemMeta(dailyMeta);

@@ -157,6 +157,9 @@ public class customEnchantmentLore {
                         thelore.add(ChatColor.GRAY + "it to yourself instead.");
                         break;
                 }
+            case "smelt":
+                thelore.add(ChatColor.GRAY + "Auto-smelts ores mined!");
+                break;
         }
         return thelore;
     }

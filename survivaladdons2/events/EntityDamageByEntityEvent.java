@@ -260,7 +260,7 @@ public class EntityDamageByEntityEvent implements Listener {
                         damager.playSound(damager.getLocation(), Sound.ENTITY_PARROT_EAT, 2, 2);
                         damager.setHealth(min(damager.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), damager.getHealth() + 0.05*level*(finalDamage + finalMagicDamage)));
                         finalDamage = finalDamage/2;
-                        finalMagicDamage = finalMagicDamage/2;
+                        //finalMagicDamage = finalMagicDamage/2;
                     }
                 }
                 //End custom enchants

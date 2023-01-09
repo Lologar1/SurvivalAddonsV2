@@ -22,7 +22,7 @@ public class onPlayerJoin implements Listener {
         Player player = e.getPlayer();
         chatChannel.sendMessage("`" + player.getDisplayName() + " joined the server !`").queue();
         if(!pdc.has(player, "dust")){
-            pdc.set(player, "dust", "0");
+            pdc.set(player, "dust", "25");
         }
         if(!pdc.has(player, "inCombat")){
             pdc.set(player, "inCombat", "false/0");
