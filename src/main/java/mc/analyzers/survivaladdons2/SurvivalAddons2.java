@@ -44,10 +44,28 @@ public final class SurvivalAddons2 extends JavaPlugin {
     public static JDA jda;
     public static TextChannel chatChannel;
 
+    public static final HashMap<String, net.md_5.bungee.api.ChatColor> colors = new HashMap<>();
+
     @Override
     public void onEnable() {
 
         plugin = this;
+
+        colors.put("teleport", net.md_5.bungee.api.ChatColor.LIGHT_PURPLE);
+        colors.put("lightning", net.md_5.bungee.api.ChatColor.YELLOW);
+        colors.put("explosive", net.md_5.bungee.api.ChatColor.RED);
+        colors.put("shortbow", net.md_5.bungee.api.ChatColor.of("#84FBDE"));
+        colors.put("dodge", net.md_5.bungee.api.ChatColor.YELLOW);
+        colors.put("experience", net.md_5.bungee.api.ChatColor.GREEN);
+        colors.put("sorcery", net.md_5.bungee.api.ChatColor.DARK_PURPLE);
+        colors.put("billionaire", net.md_5.bungee.api.ChatColor.GOLD);
+        colors.put("lifesteal", net.md_5.bungee.api.ChatColor.DARK_RED);
+        colors.put("netheritestomp", net.md_5.bungee.api.ChatColor.GRAY);
+        colors.put("glasscannon", net.md_5.bungee.api.ChatColor.WHITE);
+        colors.put("venom", net.md_5.bungee.api.ChatColor.of("#67D80E"));
+        colors.put("parasite", net.md_5.bungee.api.ChatColor.of("#BDB3FB"));
+        colors.put("gamble", net.md_5.bungee.api.ChatColor.of("#855BFB"));
+
 
         //Setting up quest
         HashMap<String, ItemStack> hourlyCommon = new HashMap<>();
