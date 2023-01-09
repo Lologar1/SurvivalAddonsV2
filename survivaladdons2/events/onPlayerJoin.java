@@ -85,7 +85,7 @@ public class onPlayerJoin implements Listener {
         player.sendMessage(ChatColor.DARK_RED + "Worldborder : 12000 blocks wide");
         player.sendMessage(ChatColor.LIGHT_PURPLE + "Join the discord to know custom crafts!");
         player.sendMessage(ChatColor.GOLD + "https://discord.gg/8Ktb72xDKN");
-        player.sendMessage(ChatColor.GREEN + "Some useful commands :" + ChatColor.GRAY + " /view, /rename, /withdraw and /deposit");
+        player.sendMessage(ChatColor.GREEN + "Some useful commands :" + ChatColor.GRAY + " /view, /rename, /withdraw, /quests, /shop and /deposit");
         if(!pdc.has(player, "firstTime")){
             giveItem(player, item("funky_feather"), 1);
             player.sendMessage(ChatColor.GREEN + "You have been granted 1 " + ChatColor.DARK_AQUA + "Funky Feather");
