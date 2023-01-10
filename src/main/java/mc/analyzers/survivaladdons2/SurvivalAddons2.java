@@ -40,47 +40,29 @@ public final class SurvivalAddons2 extends JavaPlugin {
     public static String dustIcon = "⏶";
     public static String heartIcon = "❤";
 
-    public static HashMap<String, List<String>> teams = new HashMap<>();
     public static JDA jda;
     public static TextChannel chatChannel;
-
-    public static final HashMap<String, net.md_5.bungee.api.ChatColor> colors = new HashMap<>();
 
     @Override
     public void onEnable() {
 
         plugin = this;
-
-        colors.put("teleport", net.md_5.bungee.api.ChatColor.LIGHT_PURPLE);
-        colors.put("lightning", net.md_5.bungee.api.ChatColor.YELLOW);
-        colors.put("explosive", net.md_5.bungee.api.ChatColor.RED);
-        colors.put("shortbow", net.md_5.bungee.api.ChatColor.of("#84FBDE"));
-        colors.put("dodge", net.md_5.bungee.api.ChatColor.YELLOW);
-        colors.put("experience", net.md_5.bungee.api.ChatColor.GREEN);
-        colors.put("sorcery", net.md_5.bungee.api.ChatColor.DARK_PURPLE);
-        colors.put("billionaire", net.md_5.bungee.api.ChatColor.GOLD);
-        colors.put("lifesteal", net.md_5.bungee.api.ChatColor.DARK_RED);
-        colors.put("netheritestomp", net.md_5.bungee.api.ChatColor.GRAY);
-        colors.put("glasscannon", net.md_5.bungee.api.ChatColor.WHITE);
-        colors.put("venom", net.md_5.bungee.api.ChatColor.of("#67D80E"));
-        colors.put("parasite", net.md_5.bungee.api.ChatColor.of("#BDB3FB"));
-        colors.put("gamble", net.md_5.bungee.api.ChatColor.of("#855BFB"));
-
-
         //Setting up quest
         HashMap<String, ItemStack> hourlyCommon = new HashMap<>();
-        hourlyCommon.put("10 dust", new ItemStack(Material.REDSTONE, 10));
-        hourlyCommon.put("20 dust", new ItemStack(Material.REDSTONE, 20));
-        hourlyCommon.put("15 dust", new ItemStack(Material.REDSTONE, 15));
-        hourlyCommon.put("1 diamond", new ItemStack(Material.DIAMOND, 1));
-        hourlyCommon.put("25 dust", new ItemStack(Material.REDSTONE, 25));
+        hourlyCommon.put("40 dust", new ItemStack(Material.REDSTONE, 40));
+        hourlyCommon.put("60 dust", new ItemStack(Material.REDSTONE, 60));
+        hourlyCommon.put("50 dust", new ItemStack(Material.REDSTONE, 50));
+        hourlyCommon.put("2 diamonds", new ItemStack(Material.DIAMOND, 2));
+        hourlyCommon.put("70 dust", new ItemStack(Material.REDSTONE, 70));
         hourlyQuest.setCommonRewards(hourlyCommon);
 
         HashMap<String, ItemStack> hourlyRare = new HashMap<>();
-        hourlyRare.put("Repair kit", item("repair_kit"));
+        ItemStack kits = item("repair_kit");
+        kits.setAmount(4);
+        hourlyRare.put("4 Repair kits", kits);
         hourlyRare.put("Singularity flask", item("sing_flask"));
         hourlyRare.put("10 golden apples", new ItemStack(Material.GOLDEN_APPLE, 10));
-        hourlyRare.put("20 gold ingots", new ItemStack(Material.GOLD_INGOT, 20));
+        hourlyRare.put("1 funky feather", item("funky_feather"));
         hourlyQuest.setRareRewards(hourlyRare);
 
         HashMap<String, ItemStack> dailyCommon = new HashMap<>();
@@ -89,8 +71,8 @@ public final class SurvivalAddons2 extends JavaPlugin {
         dailyCommon.put("300 dust", new ItemStack(Material.REDSTONE, 300));
         dailyCommon.put("10 diamonds", new ItemStack(Material.DIAMOND, 10));
         ItemStack feathers = item("funky_feather");
-        feathers.setAmount(3);
-        dailyCommon.put("3 funky feathers", feathers);
+        feathers.setAmount(4);
+        dailyCommon.put("4 funky feathers", feathers);
         dailyQuest.setCommonRewards(dailyCommon);
 
         HashMap<String, ItemStack> dailyRare = new HashMap<>();
@@ -101,11 +83,13 @@ public final class SurvivalAddons2 extends JavaPlugin {
         dailyQuest.setRareRewards(dailyRare);
 
         HashMap<String, ItemStack> weeklyCommon = new HashMap<>();
-        weeklyCommon.put("850 dust", new ItemStack(Material.REDSTONE, 850));
-        weeklyCommon.put("900 dust", new ItemStack(Material.REDSTONE, 900));
+        weeklyCommon.put("1.3K dust", new ItemStack(Material.REDSTONE, 1300));
+        weeklyCommon.put("1.5K dust", new ItemStack(Material.REDSTONE, 1500));
         weeklyCommon.put("1K dust", new ItemStack(Material.REDSTONE, 1000));
         weeklyCommon.put("64 diamonds", new ItemStack(Material.DIAMOND, 64));
         weeklyCommon.put("3 netherite ingots", new ItemStack(Material.NETHERITE_INGOT, 3));
+        feathers.setAmount(10);
+        weeklyCommon.put("10 funky feathers", feathers);
         weeklyQuest.setCommonRewards(weeklyCommon);
 
         HashMap<String, ItemStack> weeklyRare = new HashMap<>();
@@ -113,9 +97,10 @@ public final class SurvivalAddons2 extends JavaPlugin {
         pdc.set(harvest3, "enchantments", "harvest/4");
         syncItem(harvest3);
         weeklyRare.put("Harvest IV Book", harvest3);
-        weeklyRare.put("1.2K dust", new ItemStack(Material.REDSTONE, 1200));
-        weeklyRare.put("1.1K dust", new ItemStack(Material.REDSTONE, 1100));
-        weeklyRare.put("1.25K dust", new ItemStack(Material.REDSTONE, 1250));
+        weeklyRare.put("2K dust", new ItemStack(Material.REDSTONE, 2000));
+        weeklyRare.put("2.5K dust", new ItemStack(Material.REDSTONE, 2500));
+        feathers.setAmount(25);
+        weeklyRare.put("25 funky feathers", feathers);
         weeklyRare.put("4 netherite ingots", new ItemStack(Material.NETHERITE_INGOT, 4));
         weeklyQuest.setRareRewards(weeklyRare);
 

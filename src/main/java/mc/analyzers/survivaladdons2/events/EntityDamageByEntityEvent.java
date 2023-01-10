@@ -13,28 +13,19 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.MetadataValue;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
-import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import static java.lang.Double.max;
 import static java.lang.Double.min;
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.dustIcon;
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.heartIcon;
 import static mc.analyzers.survivaladdons2.quests.Quest.checkQuest;
-import static mc.analyzers.survivaladdons2.utility.AttributeUtils.*;
 import static mc.analyzers.survivaladdons2.utility.DamagePlayer.dealDamage;
-import static mc.analyzers.survivaladdons2.utility.customEnchantments.lightningEnchantment;
+import static mc.analyzers.survivaladdons2.customenchantments.customEnchantments.lightningEnchantment;
 import static mc.analyzers.survivaladdons2.utility.utility.*;
 import static mc.analyzers.survivaladdons2.utility.utility.giveItem;
 

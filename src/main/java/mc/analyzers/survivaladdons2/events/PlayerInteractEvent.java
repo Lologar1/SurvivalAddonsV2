@@ -30,8 +30,8 @@ import java.util.Collection;
 import static java.lang.Math.min;
 import static java.lang.Math.nextAfter;
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.dustIcon;
-import static mc.analyzers.survivaladdons2.utility.customEnchantmentsWrapper.*;
-import static mc.analyzers.survivaladdons2.utility.customEnchantmentsWrapper.legendaryEnchantments;
+import static mc.analyzers.survivaladdons2.customenchantments.customEnchantmentsWrapper.*;
+import static mc.analyzers.survivaladdons2.customenchantments.customEnchantmentsWrapper.legendaryEnchantments;
 import static mc.analyzers.survivaladdons2.utility.utility.*;
 
 public class PlayerInteractEvent implements Listener {

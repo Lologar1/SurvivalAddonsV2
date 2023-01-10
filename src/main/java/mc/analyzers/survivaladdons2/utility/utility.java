@@ -1,6 +1,7 @@
 package mc.analyzers.survivaladdons2.utility;
 
 import mc.analyzers.survivaladdons2.SurvivalAddons2;
+import mc.analyzers.survivaladdons2.customenchantments.customEnchantmentsWrapper;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -10,7 +11,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.block.data.type.Observer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -26,11 +26,10 @@ import java.util.*;
 
 import static com.google.common.primitives.Ints.max;
 import static java.lang.Math.min;
-import static mc.analyzers.survivaladdons2.SurvivalAddons2.colors;
 import static mc.analyzers.survivaladdons2.utility.AttributeUtils.getAttributeName;
 import static mc.analyzers.survivaladdons2.utility.AttributeUtils.getAttributes;
-import static mc.analyzers.survivaladdons2.utility.customEnchantmentLore.getThelore;
-import static mc.analyzers.survivaladdons2.utility.customEnchantmentsWrapper.getById;
+import static mc.analyzers.survivaladdons2.customenchantments.customEnchantmentLore.getThelore;
+import static mc.analyzers.survivaladdons2.customenchantments.customEnchantmentsWrapper.getById;
 
 public class utility {
     public static Boolean percentChance(double chance) {
@@ -274,11 +273,6 @@ public class utility {
         }
         return sb.toString();
     }
-
-    public static ChatColor getEnchantmentColor(String enchantmentId){
-        return colors.getOrDefault(enchantmentId, ChatColor.BLUE);
-    }
-
     public static void syncItem(ItemStack item){
         ArrayList<String> dontsync = new ArrayList<>(); //Temp fix to add some itemLORE ! (like ench lore but 4 items) //TODO: add  itemLore when add wand enchants or smth iodk
         dontsync.add("healing_stick");
@@ -352,7 +346,7 @@ public class utility {
                 customEnchantments.put(raw.split("/")[0], Integer.valueOf(raw.split("/")[1]));
             }
             for(String name : customEnchantments.keySet()){
-                lore.add(getEnchantmentColor(name) + getById(name).getPrettyname() + ChatColor.BLUE + " " + roman(customEnchantments.get(name)));
+                lore.add(getById(name).getColor() + getById(name).getPrettyname() + ChatColor.BLUE + " " + roman(customEnchantments.get(name)));
                 if(item.getType().equals(Material.ENCHANTED_BOOK)){ //Thingy
                     //Add proper lore !
                     lore.addAll(getThelore(name, customEnchantments.get(name)));

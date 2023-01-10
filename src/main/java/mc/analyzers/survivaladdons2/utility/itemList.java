@@ -1,24 +1,19 @@
 package mc.analyzers.survivaladdons2.utility;
 
-import jdk.internal.icu.impl.CharTrie;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.checkerframework.checker.units.qual.A;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.dustIcon;
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.heartIcon;
-import static mc.analyzers.survivaladdons2.utility.customEnchantments.teleportEnchantment;
+import static mc.analyzers.survivaladdons2.customenchantments.customEnchantments.teleportEnchantment;
 import static mc.analyzers.survivaladdons2.utility.utility.addCustomEnchantment;
 
 public class itemList {
