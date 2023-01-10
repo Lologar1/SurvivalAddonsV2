@@ -1,6 +1,7 @@
 package mc.analyzers.survivaladdons2.commands;
 
 import jdk.tools.jlink.plugin.Plugin;
+import mc.analyzers.survivaladdons2.shop.ShopItem;
 import mc.analyzers.survivaladdons2.shop.ShopItems;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -14,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.dustIcon;
@@ -24,45 +26,47 @@ public class Shop implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         Player player = (Player) sender;
-        Inventory shop = Bukkit.createInventory(player, 36, ChatColor.GRAY + "Shop");
+        Inventory shop = Bukkit.createInventory(player, 27, ChatColor.GRAY + "Shop");
 
-        shop.addItem(ShopItems.dirt.getActualItem());
-        shop.addItem(ShopItems.cobblestone.getActualItem());
+        ItemStack anvilGlass = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+        ItemMeta anvilGlassMeta = anvilGlass.getItemMeta();
+        anvilGlassMeta.setDisplayName(ChatColor.BLACK + "");
+        anvilGlass.setItemMeta(anvilGlassMeta);
 
-        shop.addItem(ShopItems.diamond.getActualItem());
-        shop.addItem(ShopItems.emerald.getActualItem());
-        shop.addItem(ShopItems.lapis_lazuli.getActualItem());
-        shop.addItem(ShopItems.gold_ingot.getActualItem());
-        shop.addItem(ShopItems.iron_ingot.getActualItem());
-        shop.addItem(ShopItems.netherite_scrap.getActualItem());
-        shop.addItem(ShopItems.bedrock.getActualItem());
-        shop.addItem(ShopItems.coal.getActualItem());
-        shop.addItem(ShopItems.bone.getActualItem());
-        shop.addItem(ShopItems.flesh.getActualItem());
-        shop.addItem(ShopItems.string.getActualItem());
-        shop.addItem(ShopItems.blazerod.getActualItem());
-        shop.addItem(ShopItems.spidereye.getActualItem());
-        shop.addItem(ShopItems.gunpowder.getActualItem());
-        shop.addItem(ShopItems.ghast_tear.getActualItem());
-        shop.addItem(ShopItems.magma_cream.getActualItem());
-        shop.addItem(ShopItems.quartz.getActualItem());
-        shop.addItem(ShopItems.ender_pearl.getActualItem());
-        shop.addItem(ShopItems.slime.getActualItem());
-
-        for(ItemStack addedItem : shop.getContents()){
-            if(addedItem == null){
-                continue;
-            }
-            addedItem.setAmount(1);
-            ItemMeta meta = addedItem.getItemMeta();
-            ArrayList<String> lore = new ArrayList<>();
-            lore.add(ChatColor.GRAY + "Click to buy for " + ChatColor.RED + getByMaterial(addedItem.getType()).getBiasedPrice() + " " + dustIcon + " dust");
-            if(!getByMaterial(addedItem.getType()).isCanSell()){
-                lore.add(ChatColor.RED + "Can't sell back!");
-            }
-            meta.setLore(lore);
-            addedItem.setItemMeta(meta);
+        for(int i = 0; i<27; i++){
+            shop.setItem(i, anvilGlass);
         }
+        ItemStack building = new ItemStack(Material.GRASS_BLOCK);
+        ItemMeta buildingMeta = building.getItemMeta();
+        buildingMeta.setDisplayName(ChatColor.GREEN + "Building blocks");
+        building.setItemMeta(buildingMeta);
+
+        ItemStack mining = new ItemStack(Material.IRON_PICKAXE);
+        ItemMeta miningMeta = mining.getItemMeta();
+        miningMeta.setDisplayName(ChatColor.GREEN + "Mining");
+        mining.setItemMeta(miningMeta);
+
+        ItemStack mob = new ItemStack(Material.ROTTEN_FLESH);
+        ItemMeta mobMeta = mob.getItemMeta();
+        mobMeta.setDisplayName(ChatColor.GREEN + "Mob drops");
+        mob.setItemMeta(mobMeta);
+
+        ItemStack farming = new ItemStack(Material.WHEAT);
+        ItemMeta farmingMeta = farming.getItemMeta();
+        farmingMeta.setDisplayName(ChatColor.GREEN + "Farming");
+        farming.setItemMeta(farmingMeta);
+
+        ItemStack other = new ItemStack(Material.LAVA_BUCKET);
+        ItemMeta otherMeta = other.getItemMeta();
+        otherMeta.setDisplayName(ChatColor.GREEN + "Miscellaneous");
+        other.setItemMeta(otherMeta);
+
+        shop.setItem(11, building);
+        shop.setItem(12, mining);
+        shop.setItem(13, mob);
+        shop.setItem(14, farming);
+        shop.setItem(15, other);
+
 
         player.openInventory(shop);
         return true;

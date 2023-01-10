@@ -26,6 +26,7 @@ import java.util.*;
 
 import static com.google.common.primitives.Ints.max;
 import static java.lang.Math.min;
+import static mc.analyzers.survivaladdons2.SurvivalAddons2.colors;
 import static mc.analyzers.survivaladdons2.utility.AttributeUtils.getAttributeName;
 import static mc.analyzers.survivaladdons2.utility.AttributeUtils.getAttributes;
 import static mc.analyzers.survivaladdons2.utility.customEnchantmentLore.getThelore;
@@ -177,7 +178,7 @@ public class utility {
         if(pdc.has(item, "id")){
             absoluteID = pdc.get(item, "id");
         }else{
-            absoluteID = item.getType().toString().toLowerCase();
+            absoluteID = item.getType().name().toLowerCase();
         }
         return absoluteID;
     }
@@ -275,22 +276,6 @@ public class utility {
     }
 
     public static ChatColor getEnchantmentColor(String enchantmentId){
-        HashMap<String, ChatColor> colors = new HashMap<>();
-        colors.put("teleport", ChatColor.LIGHT_PURPLE);
-        colors.put("lightning", ChatColor.YELLOW);
-        colors.put("explosive", ChatColor.RED);
-        colors.put("shortbow", ChatColor.of("#84FBDE"));
-        colors.put("dodge", ChatColor.YELLOW);
-        colors.put("experience", ChatColor.GREEN);
-        colors.put("sorcery", ChatColor.DARK_PURPLE);
-        colors.put("billionaire", ChatColor.GOLD);
-        colors.put("lifesteal", ChatColor.DARK_RED);
-        colors.put("netheritestomp", ChatColor.GRAY);
-        colors.put("glasscannon", ChatColor.WHITE);
-        colors.put("venom", ChatColor.of("#67D80E"));
-        colors.put("parasite", ChatColor.of("#BDB3FB"));
-        colors.put("gamble", ChatColor.of("#855BFB"));
-
         return colors.getOrDefault(enchantmentId, ChatColor.BLUE);
     }
 

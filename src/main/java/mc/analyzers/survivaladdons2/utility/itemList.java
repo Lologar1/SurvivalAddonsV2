@@ -257,21 +257,19 @@ public class itemList {
         fallenMeta.setLore(fallenLore);
         fallen_star.setItemMeta(fallenMeta);
 
-        ItemStack legit_gem = new ItemStack(Material.EMERALD);
-        pdc.set(legit_gem, "id", "legit_gem");
+        ItemStack legit_gem = new ItemStack(Material.CYAN_DYE);
+        pdc.set(legit_gem, "id", "stock_of_stonks");
         ItemMeta legitMeta = legit_gem.getItemMeta();
         ArrayList<String> legitlore = new ArrayList<>();
-        legitlore.add(ChatColor.GRAY + "Right-click to select any " + ChatColor.YELLOW + "custom enchantment");
-        legitlore.add(ChatColor.GRAY + "at 1 level below its max!");
-        legitlore.add(ChatColor.RED + "Consumed on use.");
+        legitlore.add(ChatColor.GRAY + "Does nothing! Good investment, though...");
         legitMeta.setLore(legitlore);
-        legitMeta.setDisplayName(ChatColor.DARK_GREEN + "Totally legit gem");
+        legitMeta.setDisplayName(ChatColor.DARK_RED + "Stock of Stonks");
         legit_gem.setItemMeta(legitMeta);
 
         ItemStack theitem = null;
 
         switch (id){
-            case "legit_gem":
+            case "stock_of_stonks":
                 theitem = legit_gem;
                 break;
             case "fallen_star":

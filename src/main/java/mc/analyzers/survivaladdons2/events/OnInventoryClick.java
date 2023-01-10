@@ -29,6 +29,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.checkerframework.checker.units.qual.A;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.dustIcon;
@@ -808,24 +809,77 @@ public class OnInventoryClick implements Listener {
             if(!(shop.getItem(e.getSlot()) == null)){
                 if(shop.getType().equals(InventoryType.PLAYER)){
                     ItemStack sold = e.getCurrentItem();
-                    if(getByMaterial(sold.getType())==null || !getByMaterial(sold.getType()).isCanSell() || pdc.has(sold, "id")){
+                    if(getByMaterial(sold)==null || !getByMaterial(sold).isCanSell()){
                         player.sendMessage(ChatColor.RED + "Can't sell this to the shop!");
                         return;
                     }
-                    ShopItem shopItem = getByMaterial(sold.getType());
+                    ShopItem shopItem = getByMaterial(sold);
                     shop.setItem(e.getSlot(), new ItemStack(Material.AIR));
                     int price = shopItem.sellItem(sold.getAmount());
                     pdc.set(player, "dust", String.valueOf(Integer.parseInt(pdc.get(player, "dust")) + price));
-                    player.sendMessage(ChatColor.GREEN + "Sold " + sold.getAmount() + " " + capFirst(shopItem.getActualItem().getType().toString().replace('_', ' ').toLowerCase(Locale.ROOT)) + " for " + ChatColor.RED + price + " " + dustIcon + " dust.");
+                    player.sendMessage(ChatColor.GREEN + "Sold " + sold.getAmount() + " " + capFirst(getAbsoluteId(sold).replace('_', ' ').toLowerCase(Locale.ROOT)) + " for " + ChatColor.RED + price + " " + dustIcon + " dust.");
                     shop = e.getInventory();
                 }else{
+                    if(shop.getItem(0).getType().equals(Material.GRAY_STAINED_GLASS_PANE)){
+                        //Still selecting
+                        if(e.getCurrentItem().getType().equals(Material.GRAY_STAINED_GLASS_PANE)){
+                            return;
+                        }
+                        String category;
+                        switch (e.getCurrentItem().getType()){
+                            case GRASS_BLOCK:
+                                category = "blocks";
+                                break;
+                            case IRON_PICKAXE:
+                                category = "mining";
+                                break;
+                            case ROTTEN_FLESH:
+                                category = "mob";
+                                break;
+                            case WHEAT:
+                                category = "farming";
+                                break;
+                            default:
+                                category = "other";
+                                break;
+                        }
+                        shop.clear();
+                        for (Field added : ShopItems.class.getFields()){
+                            try {
+                                ShopItem toAdd = ((ShopItem) added.get(ShopItems.class));
+                                if(toAdd.getCategory().toLowerCase(Locale.ROOT).equals(category)){
+                                    shop.addItem(toAdd.getActualItem());
+                                }
+                            } catch (IllegalAccessException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                        for(ItemStack addedItem : shop.getContents()){
+                            if(addedItem == null){
+                                continue;
+                            }
+                            addedItem.setAmount(1);
+                            ItemMeta meta = addedItem.getItemMeta();
+                            ArrayList<String> lore = new ArrayList<>();
+                            lore.add(ChatColor.GRAY + "Click to buy for " + ChatColor.RED + getByMaterial(addedItem).getBiasedPrice() + " " + dustIcon + " dust");
+                            if(!getByMaterial(addedItem).isCanSell()){
+                                lore.add(ChatColor.RED + "Can't sell back!");
+                            }
+                            meta.setLore(lore);
+                            addedItem.setItemMeta(meta);
+                        }
+                        return;
+                    }
                     //Bought an item!!!
                     int qty = 1;
                     if(e.getClick().equals(ClickType.RIGHT)){
                         qty = 64;
                     }
                     ItemStack clicked = e.getCurrentItem();
-                    ShopItem bought = getByMaterial(clicked.getType());
+                    ShopItem bought;
+                    bought = getByMaterial(clicked);
+
+
                     int price = bought.buyItem(qty);
                     if(Integer.parseInt(pdc.get(player, "dust")) < price){
                         player.sendMessage(ChatColor.RED + "Not enough dust!");
@@ -834,7 +888,7 @@ public class OnInventoryClick implements Listener {
                     }
                     pdc.set(player, "dust", String.valueOf(Integer.parseInt(pdc.get(player, "dust")) - price));
                     giveItem(player, bought.getActualItem(), qty);
-                    player.sendMessage(ChatColor.GREEN + "Bought " + qty + " " + capFirst(bought.getActualItem().getType().toString().replace('_', ' ').toLowerCase(Locale.ROOT)) + " for " + ChatColor.RED + price + " " + dustIcon + " dust.");
+                    player.sendMessage(ChatColor.GREEN + "Bought " + qty + " " + capFirst(getAbsoluteId(clicked).replace('_', ' ').toLowerCase(Locale.ROOT)) + " for " + ChatColor.RED + price + " " + dustIcon + " dust.");
                 }
                 for(ItemStack addedItem : shop.getContents()){
                     if(addedItem == null){
@@ -843,8 +897,8 @@ public class OnInventoryClick implements Listener {
                     addedItem.setAmount(1);
                     ItemMeta meta = addedItem.getItemMeta();
                     ArrayList<String> lore = new ArrayList<>();
-                    lore.add(ChatColor.GRAY + "Click to buy for " + ChatColor.RED + getByMaterial(addedItem.getType()).getBiasedPrice() + " " + dustIcon + " dust");
-                    if(!getByMaterial(addedItem.getType()).isCanSell()){
+                    lore.add(ChatColor.GRAY + "Click to buy for " + ChatColor.RED + getByMaterial(addedItem).getBiasedPrice() + " " + dustIcon + " dust");
+                    if(!getByMaterial(addedItem).isCanSell()){
                         lore.add(ChatColor.RED + "Can't sell back!");
                     }
                     meta.setLore(lore);
