@@ -1,7 +1,7 @@
 package mc.analyzers.survivaladdons2.commands;
 
 import mc.analyzers.survivaladdons2.SurvivalAddons2;
-import mc.analyzers.survivaladdons2.utility.pdc;
+import mc.analyzers.survivaladdons2.utility.PDCUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -16,7 +16,7 @@ public class Spawn implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(sender instanceof Player){
             Player player = (Player) sender;
-            if(pdc.get(player, "inCombat").contains("true")){
+            if(PDCUtils.get(player, "inCombat").contains("true")){
                 player.sendMessage(ChatColor.RED + "You are in combat!");
                 return true;
             }

@@ -1,7 +1,6 @@
 package mc.analyzers.survivaladdons2.commands;
 
 import mc.analyzers.survivaladdons2.SurvivalAddons2;
-import mc.analyzers.survivaladdons2.utility.pdc;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import static mc.analyzers.survivaladdons2.utility.utility.setEffect;
+import static mc.analyzers.survivaladdons2.utility.PlayerUtils.setEffect;
 
 public class SetEffect implements CommandExecutor {
     @Override

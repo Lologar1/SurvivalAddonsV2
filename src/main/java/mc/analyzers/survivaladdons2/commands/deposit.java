@@ -1,6 +1,6 @@
 package mc.analyzers.survivaladdons2.commands;
 
-import mc.analyzers.survivaladdons2.utility.pdc;
+import mc.analyzers.survivaladdons2.utility.PDCUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.dustIcon;
-import static mc.analyzers.survivaladdons2.utility.utility.giveItem;
 
 public class deposit implements CommandExecutor {
     @Override
@@ -19,7 +18,7 @@ public class deposit implements CommandExecutor {
         if(player.getInventory().contains(Material.REDSTONE) || player.getInventory().contains(Material.REDSTONE_BLOCK)){
             int dustToAdd = 0;
             for(ItemStack item : player.getInventory()){
-                if(item != null && !(pdc.has(item, "id")) && (item.getType().equals(Material.REDSTONE) || item.getType().equals(Material.REDSTONE_BLOCK))){
+                if(item != null && !(PDCUtils.has(item, "id")) && (item.getType().equals(Material.REDSTONE) || item.getType().equals(Material.REDSTONE_BLOCK))){
                     if(item.getType().equals(Material.REDSTONE_BLOCK)){
                         dustToAdd += item.getAmount() * 9;
                     }else{
@@ -29,7 +28,7 @@ public class deposit implements CommandExecutor {
                     item.setAmount(0);
                 }
             }
-            pdc.set(player, "dust", String.valueOf(Integer.parseInt(pdc.get(player, "dust")) + dustToAdd));
+            PDCUtils.set(player, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(player, "dust")) + dustToAdd));
             player.sendMessage(ChatColor.GRAY + "Deposited " + ChatColor.GREEN + dustToAdd + ChatColor.RED + " " + dustIcon + " dust.");
         }else{
             player.sendMessage(ChatColor.RED + "No redstone to deposit !");

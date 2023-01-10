@@ -1,7 +1,7 @@
 package mc.analyzers.survivaladdons2.tasks;
 
 import mc.analyzers.survivaladdons2.SurvivalAddons2;
-import mc.analyzers.survivaladdons2.utility.pdc;
+import mc.analyzers.survivaladdons2.utility.PDCUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -12,12 +12,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
-import java.util.Objects;
 
-import static mc.analyzers.survivaladdons2.utility.AttributeUtils.setAttribute;
 import static mc.analyzers.survivaladdons2.utility.AttributeUtils.syncAttributes;
-import static mc.analyzers.survivaladdons2.utility.utility.getAbsoluteId;
-import static mc.analyzers.survivaladdons2.utility.utility.syncItem;
 
 public class SyncAttributes extends BukkitRunnable {
     Player player;
@@ -124,7 +120,7 @@ public class SyncAttributes extends BukkitRunnable {
             }
         }
         //Nightvision enchant
-        if(pdc.has(player.getInventory().getHelmet(), "enchantments") && pdc.get(player.getInventory().getHelmet(), "enchantments").contains("nightvision")){
+        if(PDCUtils.has(player.getInventory().getHelmet(), "enchantments") && PDCUtils.get(player.getInventory().getHelmet(), "enchantments").contains("nightvision")){
             player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 1000, 1));
         }
         if(SurvivalAddons2.getPlugin().getServer().getOnlinePlayers().contains(player)){

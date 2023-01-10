@@ -1,11 +1,10 @@
 package mc.analyzers.survivaladdons2.events;
 
-import mc.analyzers.survivaladdons2.utility.pdc;
-import mc.analyzers.survivaladdons2.utility.utility;
+import mc.analyzers.survivaladdons2.utility.PDCUtils;
+import mc.analyzers.survivaladdons2.utility.MiscUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,9 +22,9 @@ public class onProjectileHit implements Listener {
             Player player = (Player) e.getEntity().getShooter();
             AbstractArrow arrow = (AbstractArrow)  e.getEntity();
             Location playerLocation = player.getLocation();
-            if(pdc.has(arrow, "data")){
+            if(PDCUtils.has(arrow, "data")){
                 Location arrowLocation = arrow.getLocation();
-                String rawData = pdc.get(arrow, "data");
+                String rawData = PDCUtils.get(arrow, "data");
                 String[] modifiers = rawData.split(" ");
                 for(String modifier : modifiers){
                     if(modifier.equals("") || modifier.equals(" ")){
@@ -43,20 +42,20 @@ public class onProjectileHit implements Listener {
                             break;
                         case "explosive":
                             int excost = 5/power;
-                            if(Integer.parseInt(pdc.get(player, "dust")) >= excost){
+                            if(Integer.parseInt(PDCUtils.get(player, "dust")) >= excost){
                                 arrow.remove();
                                 player.getWorld().createExplosion(arrowLocation, power, false, false);
-                                pdc.set(player, "dust", String.valueOf(Integer.parseInt(pdc.get(player, "dust")) - excost));
+                                PDCUtils.set(player, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(player, "dust")) - excost));
                                 player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "BAM! " + ChatColor.RESET + ChatColor.GRAY + "Explosion cost " + ChatColor.RED + excost + " " + dustIcon + " dust.");
                             }
                             break;
                         case "ftts":
                             if(e.getHitEntity() != null){
-                                if(!pdc.has(player, "fttsCount")){
-                                    pdc.set(player, "fttsCount", "1");
+                                if(!PDCUtils.has(player, "fttsCount")){
+                                    PDCUtils.set(player, "fttsCount", "1");
                                     return;
                                 }
-                                pdc.set(player, "fttsCount", String.valueOf(Integer.parseInt(pdc.get(player, "fttsCount")) + 1));
+                                PDCUtils.set(player, "fttsCount", String.valueOf(Integer.parseInt(PDCUtils.get(player, "fttsCount")) + 1));
                                 int lenght = 6;
                                 int requiredShots = 3;
                                 if(power > 1){
@@ -67,14 +66,14 @@ public class onProjectileHit implements Listener {
                                 if(power >= 3){
                                     speedAmplifier = 1;
                                 }
-                                if(Integer.parseInt(pdc.get(player, "fttsCount")) >= requiredShots){
-                                    pdc.set(player, "fttsCount", "0");
+                                if(Integer.parseInt(PDCUtils.get(player, "fttsCount")) >= requiredShots){
+                                    PDCUtils.set(player, "fttsCount", "0");
                                     player.sendMessage(net.md_5.bungee.api.ChatColor.of("#D0FF48") +""+ ChatColor.BOLD + "FTTS! " + ChatColor.RESET + ChatColor.GRAY + "Speed " +
-                                            utility.roman(speedAmplifier + 1) + " for " + lenght + " seconds.");
+                                            MiscUtils.roman(speedAmplifier + 1) + " for " + lenght + " seconds.");
                                     player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, lenght * 20, speedAmplifier));
                                 }
                             }else{
-                                pdc.set(player, "fttsCount", "0");
+                                PDCUtils.set(player, "fttsCount", "0");
                             }
                     }
                 }

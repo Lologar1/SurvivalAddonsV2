@@ -1,16 +1,11 @@
 package mc.analyzers.survivaladdons2.shop;
 
-import jdk.tools.jlink.plugin.Plugin;
 import mc.analyzers.survivaladdons2.SurvivalAddons2;
-import mc.analyzers.survivaladdons2.commands.Shop;
-import mc.analyzers.survivaladdons2.utility.pdc;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Locale;
 
-import static mc.analyzers.survivaladdons2.shop.ShopItems.*;
-import static mc.analyzers.survivaladdons2.utility.utility.getAbsoluteId;
+import static mc.analyzers.survivaladdons2.utility.ItemStackUtils.getAbsoluteId;
 
 public class ShopItem {
     private final ItemStack actualItem;
@@ -22,12 +17,7 @@ public class ShopItem {
     private String category;
 
     public static ShopItem getByMaterial(ItemStack type){
-        String id;
-        if(pdc.has(type, "id")){
-            id = pdc.get(type, "id");
-        }else {
-            id = type.getType().name();
-        }
+        String id = getAbsoluteId(type);
         try{
             return (ShopItem) ShopItems.class.getField(id.toLowerCase(Locale.ROOT)).get(ShopItems.class);
         }catch (Exception e){

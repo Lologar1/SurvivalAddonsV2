@@ -1,6 +1,6 @@
 package mc.analyzers.survivaladdons2.events;
 
-import mc.analyzers.survivaladdons2.utility.pdc;
+import mc.analyzers.survivaladdons2.utility.PDCUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -12,9 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import static mc.analyzers.survivaladdons2.quests.Quest.checkQuest;
-import static mc.analyzers.survivaladdons2.utility.AttributeUtils.syncAttributes;
-import static mc.analyzers.survivaladdons2.utility.itemList.item;
-import static mc.analyzers.survivaladdons2.utility.utility.syncItem;
+import static mc.analyzers.survivaladdons2.utility.ItemList.item;
 
 public class OnPlayerCraft implements Listener {
     @EventHandler
@@ -42,7 +40,7 @@ public class OnPlayerCraft implements Listener {
         if(e.getInventory().getResult().equals(item("funky_feather"))){
             checkQuest("craft", "feather", (Player) e.getWhoClicked(), 1);
         }
-        if(pdc.has(e.getInventory().getResult(), "id")){
+        if(PDCUtils.has(e.getInventory().getResult(), "id")){
             checkQuest("craft", "custom", (Player) e.getWhoClicked(), 1);
         }
     }

@@ -9,7 +9,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import static mc.analyzers.survivaladdons2.utility.utility.giveItem;
+import static mc.analyzers.survivaladdons2.utility.PlayerUtils.giveItem;
+
 
 public class OnInventoryClose implements Listener {
     @EventHandler

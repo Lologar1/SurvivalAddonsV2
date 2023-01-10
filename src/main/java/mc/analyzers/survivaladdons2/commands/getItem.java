@@ -1,8 +1,8 @@
 package mc.analyzers.survivaladdons2.commands;
 
 import mc.analyzers.survivaladdons2.SurvivalAddons2;
-import mc.analyzers.survivaladdons2.utility.itemList;
-import mc.analyzers.survivaladdons2.utility.pdc;
+import mc.analyzers.survivaladdons2.utility.ItemList;
+import mc.analyzers.survivaladdons2.utility.PDCUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -15,11 +15,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import static com.sun.tools.sjavac.Util.set;
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.dustIcon;
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.heartIcon;
-import static mc.analyzers.survivaladdons2.utility.utility.giveItem;
-import static mc.analyzers.survivaladdons2.utility.utility.syncItem;
+import static mc.analyzers.survivaladdons2.utility.PlayerUtils.giveItem;
+import static mc.analyzers.survivaladdons2.utility.ItemStackUtils.syncItem;
 
 public class getItem implements CommandExecutor {
     @Override
@@ -31,19 +30,19 @@ public class getItem implements CommandExecutor {
         }
         int amount = Integer.parseInt(args[2]);
         try{
-            giveItem(player, itemList.item(args[1].toLowerCase(Locale.ROOT)), amount);
+            giveItem(player, ItemList.item(args[1].toLowerCase(Locale.ROOT)), amount);
         }catch (Exception ignored){}
 
         switch(args[1].toLowerCase()){
             case "enchanted_book":
                 ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
-                pdc.set(book, "enchantments", args[3] + "/" + args[4] + " ");
+                PDCUtils.set(book, "enchantments", args[3] + "/" + args[4] + " ");
                 syncItem(book);
                 giveItem(player, book, amount);
                 break;
             case "healing_stick":
-                ItemStack stick = itemList.item("healing_stick");
-                pdc.set(stick, "healing", args[2]);
+                ItemStack stick = ItemList.item("healing_stick");
+                PDCUtils.set(stick, "healing", args[2]);
                 ArrayList<String> healinglore = new ArrayList<>();
                 healinglore.add(ChatColor.GRAY + "Use this item to heal for");
                 healinglore.add(ChatColor.RED + args[2] + heartIcon + ChatColor.GRAY + ", costing " + ChatColor.RED + args[2] + dustIcon + " dust.");
@@ -53,8 +52,8 @@ public class getItem implements CommandExecutor {
                 giveItem(player, stick, amount);
                 break;
             case "food_stick":
-                stick = itemList.item("food_stick");
-                pdc.set(stick, "food", args[2]);
+                stick = ItemList.item("food_stick");
+                PDCUtils.set(stick, "food", args[2]);
                 ArrayList<String> foodlore = new ArrayList<>();
                 foodlore.add(ChatColor.GRAY + "Use this item to satiate for");
                 foodlore.add(ChatColor.GOLD + String.valueOf(Integer.parseInt(args[2])*6) + " saturation" + ChatColor.GRAY + ", costing " + ChatColor.RED + args[2] + dustIcon + " dust.");
@@ -64,8 +63,8 @@ public class getItem implements CommandExecutor {
                 giveItem(player, stick, amount);
                 break;
             case "fling_stick":
-                stick = itemList.item("fling_stick");
-                pdc.set(stick, "fling", args[2]);
+                stick = ItemList.item("fling_stick");
+                PDCUtils.set(stick, "fling", args[2]);
                 ArrayList<String> flinglore = new ArrayList<>();
                 flinglore.add(ChatColor.DARK_RED + "ADMIN ITEM");
                 flinglore.add(ChatColor.GRAY + "Use this item to launch yourself!");
@@ -75,10 +74,10 @@ public class getItem implements CommandExecutor {
                 giveItem(player, stick, amount);
                 break;
             case "wooden_armor":
-                giveItem(player, itemList.item("wooden_helmet"), 1);
-                giveItem(player, itemList.item("wooden_chestplate"), 1);
-                giveItem(player, itemList.item("wooden_leggings"), 1);
-                giveItem(player, itemList.item("wooden_boots"), 1);
+                giveItem(player, ItemList.item("wooden_helmet"), 1);
+                giveItem(player, ItemList.item("wooden_chestplate"), 1);
+                giveItem(player, ItemList.item("wooden_leggings"), 1);
+                giveItem(player, ItemList.item("wooden_boots"), 1);
                 break;
         }
         return true;

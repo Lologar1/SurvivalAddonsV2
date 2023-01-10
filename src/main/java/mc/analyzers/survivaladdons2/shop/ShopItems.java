@@ -1,11 +1,9 @@
 package mc.analyzers.survivaladdons2.shop;
 
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
-import sun.jvm.hotspot.types.JDoubleField;
 
-import static mc.analyzers.survivaladdons2.utility.itemList.item;
+import static mc.analyzers.survivaladdons2.utility.ItemList.item;
 
 public class ShopItems {
     public static final ShopItem iron_ingot = new ShopItem(new ItemStack(Material.IRON_INGOT), 16, 10, true, "mining");
@@ -52,6 +50,7 @@ public class ShopItems {
     public static final ShopItem repair_kit = new ShopItem(item("repair_kit"), 4, 10, true, "other");
     public static final ShopItem glowstone_dust = new ShopItem(new ItemStack(Material.GLOWSTONE_DUST), 32, 2, true, "mining");
     public static final ShopItem apple = new ShopItem(new ItemStack(Material.APPLE), 32, 4, true, "farming");
+    public static final ShopItem arrow = new ShopItem(new ItemStack(Material.ARROW), 64, 1, true, "other");
 
     public static final ShopItem lava_bucket = new ShopItem(new ItemStack(Material.LAVA_BUCKET), 10000000, 4, false, "other");
     public static final ShopItem water_bucket = new ShopItem(new ItemStack(Material.WATER_BUCKET), 10000000, 4, false, "other");

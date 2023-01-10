@@ -1,6 +1,6 @@
 package mc.analyzers.survivaladdons2.commands;
 
-import mc.analyzers.survivaladdons2.utility.pdc;
+import mc.analyzers.survivaladdons2.utility.PDCUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,7 +16,7 @@ public class getDust implements CommandExecutor {
             return false;
         }
         if(args.length == 1){
-            pdc.set(player, "dust", args[0]);
+            PDCUtils.set(player, "dust", args[0]);
         }else{
             player.sendMessage(ChatColor.RED + "Improper usage! Provide one valid argument.");
         }

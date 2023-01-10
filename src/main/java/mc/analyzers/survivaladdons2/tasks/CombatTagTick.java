@@ -1,9 +1,7 @@
 package mc.analyzers.survivaladdons2.tasks;
 
 import mc.analyzers.survivaladdons2.SurvivalAddons2;
-import mc.analyzers.survivaladdons2.utility.pdc;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import mc.analyzers.survivaladdons2.utility.PDCUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -15,8 +13,7 @@ import java.util.Locale;
 
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.dustIcon;
 import static mc.analyzers.survivaladdons2.utility.AttributeUtils.getDefenseValues;
-import static mc.analyzers.survivaladdons2.utility.AttributeUtils.getProtectionFactors;
-import static mc.analyzers.survivaladdons2.utility.utility.capFirst;
+import static mc.analyzers.survivaladdons2.utility.MiscUtils.capFirst;
 
 public class CombatTagTick extends BukkitRunnable {
 
@@ -30,27 +27,27 @@ public class CombatTagTick extends BukkitRunnable {
 
     @Override
     public void run() {
-        int secondsLeft = Integer.parseInt(pdc.get(player, "inCombat").split("/")[1]);
+        int secondsLeft = Integer.parseInt(PDCUtils.get(player, "inCombat").split("/")[1]);
         ScoreboardManager manager = Bukkit.getScoreboardManager();
         Scoreboard board = manager.getNewScoreboard();
         Objective objective = board.registerNewObjective("info", "dummy", ChatColor.BOLD + "" + net.md_5.bungee.api.ChatColor.of("#F859FB") + "Player Info");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         Score status = objective.getScore(ChatColor.BLUE + "Status : " + ChatColor.GREEN + "Idling");
         if(secondsLeft >= 1){
-            pdc.set(player, "inCombat", "true/" + (secondsLeft - 1));
+            PDCUtils.set(player, "inCombat", "true/" + (secondsLeft - 1));
             //player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "In combat (" + secondsLeft + "s left)"));
             player.setGliding(false);
             status = objective.getScore(ChatColor.BLUE + "Status : " + ChatColor.RED + "In combat (" + secondsLeft + "s left)");
         }else{
-            pdc.set(player, "inCombat", "false/0");
-            pdc.set(player, "damageValues", "0/0"); //Dealt/Taken
-            pdc.set(player, "assist", ""); //Player's names : Analyzers/CarryBit etc.
+            PDCUtils.set(player, "inCombat", "false/0");
+            PDCUtils.set(player, "damageValues", "0/0"); //Dealt/Taken
+            PDCUtils.set(player, "assist", ""); //Player's names : Analyzers/CarryBit etc.
             //player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GREEN + "Defense : " +
             //(int) Math.round( (1-(getProtectionFactors(player)[0] - 0.2)/0.8)*1000 ) + ChatColor.AQUA + " Magic Defense : " + (int) Math.round( (1-(getProtectionFactors(player)[1] - 0.2)/0.8)*1000)));
         }
-        player.setPlayerListName(player.getDisplayName() + " " + ChatColor.GOLD + "Dust: " + ChatColor.RED + pdc.get(player, "dust"));
+        player.setPlayerListName(player.getDisplayName() + " " + ChatColor.GOLD + "Dust: " + ChatColor.RED + PDCUtils.get(player, "dust"));
 
-        Score score = objective.getScore(ChatColor.RED + dustIcon + " Redstone Dust " + ChatColor.GOLD + ": " + pdc.get(player, "dust"));
+        Score score = objective.getScore(ChatColor.RED + dustIcon + " Redstone Dust " + ChatColor.GOLD + ": " + PDCUtils.get(player, "dust"));
         double defense = getDefenseValues(player)[0];
         double magicdef = getDefenseValues(player)[1];
         score.setScore(10);
@@ -68,10 +65,10 @@ public class CombatTagTick extends BukkitRunnable {
         Score em2 = objective.getScore("     ");
         em2.setScore(4);
 
-        if(!pdc.get(player, "currentQuestType").equals("none")){
-            String currentProgress = pdc.get(player, pdc.get(player, "currentQuestType").toLowerCase(Locale.ROOT) + "QuestProgress");
+        if(!PDCUtils.get(player, "currentQuestType").equals("none")){
+            String currentProgress = PDCUtils.get(player, PDCUtils.get(player, "currentQuestType").toLowerCase(Locale.ROOT) + "QuestProgress");
             String[] split = currentProgress.split("/");
-            Score activeQuest = objective.getScore((ChatColor.GRAY + capFirst(pdc.get(player, "currentQuestType")) + " quest! " + Integer.parseInt(split[0]) + "/" + split[1] + " finished."));
+            Score activeQuest = objective.getScore((ChatColor.GRAY + capFirst(PDCUtils.get(player, "currentQuestType")) + " quest! " + Integer.parseInt(split[0]) + "/" + split[1] + " finished."));
             activeQuest.setScore(3);
         }else{
             Score activeQuest = objective.getScore("No active quests!");

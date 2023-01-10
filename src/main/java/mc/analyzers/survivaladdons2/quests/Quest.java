@@ -1,9 +1,6 @@
 package mc.analyzers.survivaladdons2.quests;
 
-import mc.analyzers.survivaladdons2.SurvivalAddons2;
-import mc.analyzers.survivaladdons2.utility.pdc;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import mc.analyzers.survivaladdons2.utility.PDCUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -11,7 +8,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-import static mc.analyzers.survivaladdons2.utility.utility.*;
+import static mc.analyzers.survivaladdons2.utility.PlayerUtils.giveItem;
+import static mc.analyzers.survivaladdons2.utility.MiscUtils.*;
 
 public class Quest {
     private final String type;
@@ -22,28 +20,28 @@ public class Quest {
     double commonPercent;
 
     public static void checkQuest(String action, String kind, Player player, int amount){
-        if(pdc.get(player, "activeHourlyQuest").contains(action)){
-            if(pdc.get(player, "activeHourlyQuest").contains(kind)) {
-                incrementQuest("hourly", pdc.get(player, "activeHourlyQuest"), player, amount);
+        if(PDCUtils.get(player, "activeHourlyQuest").contains(action)){
+            if(PDCUtils.get(player, "activeHourlyQuest").contains(kind)) {
+                incrementQuest("hourly", PDCUtils.get(player, "activeHourlyQuest"), player, amount);
             }
         }
-        if(pdc.get(player, "activeDailyQuest").contains(action)){
-            if(pdc.get(player, "activeDailyQuest").contains(kind)) {
-                incrementQuest("daily", pdc.get(player, "activeDailyQuest"), player, amount);
+        if(PDCUtils.get(player, "activeDailyQuest").contains(action)){
+            if(PDCUtils.get(player, "activeDailyQuest").contains(kind)) {
+                incrementQuest("daily", PDCUtils.get(player, "activeDailyQuest"), player, amount);
             }
         }
-        if(pdc.get(player, "activeWeeklyQuest").contains(action)){
-            if(pdc.get(player, "activeWeeklyQuest").contains(kind)) {
-                incrementQuest("weekly", pdc.get(player, "activeWeeklyQuest"), player, amount);
+        if(PDCUtils.get(player, "activeWeeklyQuest").contains(action)){
+            if(PDCUtils.get(player, "activeWeeklyQuest").contains(kind)) {
+                incrementQuest("weekly", PDCUtils.get(player, "activeWeeklyQuest"), player, amount);
             }
         }
     }
 
     public static void incrementQuest(String type, String questId, Player player, int amount){
-        String currentProgress = pdc.get(player, type.toLowerCase(Locale.ROOT) + "QuestProgress");
+        String currentProgress = PDCUtils.get(player, type.toLowerCase(Locale.ROOT) + "QuestProgress");
         String[] split = currentProgress.split("/");
         String newProgress = (Integer.parseInt(split[0]) + amount) + "/" + split[1];
-        pdc.set(player, type.toLowerCase(Locale.ROOT) + "QuestProgress", newProgress);
+        PDCUtils.set(player, type.toLowerCase(Locale.ROOT) + "QuestProgress", newProgress);
 
         if(Integer.parseInt(split[0]) + amount >= Integer.parseInt(split[1])){
             //Quest finished!
@@ -51,10 +49,10 @@ public class Quest {
             List<String> keyList;
             HashMap<String, ItemStack> drops;
             if(percentChance(getByType(type).getCommonPercent())){
-                keyList = new ArrayList<String>(getByType(type).commonRewards.keySet());
+                keyList = new ArrayList<>(getByType(type).commonRewards.keySet());
                 drops = getByType(type).commonRewards;
             }else{
-                keyList = new ArrayList<String>(getByType(type).rareRewards.keySet());
+                keyList = new ArrayList<>(getByType(type).rareRewards.keySet());
                 drops = getByType(type).rareRewards;
             }
 
@@ -66,15 +64,15 @@ public class Quest {
 
             player.sendMessage(ChatColor.GRAY + "Got " + message);
             if(item.getType().equals(Material.REDSTONE)){
-                pdc.set(player, "dust", (String.valueOf( (Integer.parseInt(pdc.get(player, "dust")) + item.getAmount()) )));
+                PDCUtils.set(player, "dust", (String.valueOf( (Integer.parseInt(PDCUtils.get(player, "dust")) + item.getAmount()) )));
             }else{
                 giveItem(player, item, item.getAmount());
             }
-            pdc.set(player, type.toLowerCase(Locale.ROOT) + "QuestProgress", "0/0");
-            pdc.set(player, type.toLowerCase(Locale.ROOT) + "Last", String.valueOf(System.currentTimeMillis()));
-            pdc.set(player, "active" + capFirst(type.toLowerCase(Locale.ROOT)) + "Quest", "null");
-            pdc.set(player, "currentQuestType", "none");
-            pdc.set(player, "deactivated" + capFirst(type.toLowerCase(Locale.ROOT)) + "Quest", "null");
+            PDCUtils.set(player, type.toLowerCase(Locale.ROOT) + "QuestProgress", "0/0");
+            PDCUtils.set(player, type.toLowerCase(Locale.ROOT) + "Last", String.valueOf(System.currentTimeMillis()));
+            PDCUtils.set(player, "active" + capFirst(type.toLowerCase(Locale.ROOT)) + "Quest", "null");
+            PDCUtils.set(player, "currentQuestType", "none");
+            PDCUtils.set(player, "deactivated" + capFirst(type.toLowerCase(Locale.ROOT)) + "Quest", "null");
         }
     }
 
@@ -110,16 +108,6 @@ public class Quest {
         this.rareRewards = rareRewards;
     }
 
-    public boolean checkAvaliability(Player player){
-        boolean canDo = false;
-        long lastDid = Long.parseLong(pdc.get(player, type+"Last"));
-        //Types: weeklyLast,dailyLast, etc.
-        if(lastDid+delay <= System.currentTimeMillis()){
-            canDo = true;
-        }
-        return canDo;
-    }
-
     public String getPrettyNameFromId(String id){
         String[] split = id.split("/");
         String questType = split[0];
@@ -153,14 +141,6 @@ public class Quest {
 
     public double getCommonPercent() {
         return commonPercent;
-    }
-
-    public HashMap<String, ItemStack> getCommonRewards() {
-        return commonRewards;
-    }
-
-    public HashMap<String, ItemStack> getRareRewards() {
-        return rareRewards;
     }
 
     public String getType() {

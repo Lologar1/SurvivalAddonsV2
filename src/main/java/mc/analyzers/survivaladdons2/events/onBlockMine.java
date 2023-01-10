@@ -1,33 +1,26 @@
 package mc.analyzers.survivaladdons2.events;
 
-import mc.analyzers.survivaladdons2.utility.itemList;
-import mc.analyzers.survivaladdons2.utility.pdc;
+import mc.analyzers.survivaladdons2.utility.ItemStackUtils;
+import mc.analyzers.survivaladdons2.utility.PDCUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Random;
 
 import static java.lang.Math.max;
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.dustIcon;
 import static mc.analyzers.survivaladdons2.quests.Quest.checkQuest;
-import static mc.analyzers.survivaladdons2.quests.Quest.incrementQuest;
-import static mc.analyzers.survivaladdons2.utility.itemList.item;
-import static mc.analyzers.survivaladdons2.utility.utility.*;
+import static mc.analyzers.survivaladdons2.utility.PlayerUtils.giveItem;
+import static mc.analyzers.survivaladdons2.utility.ItemList.item;
+import static mc.analyzers.survivaladdons2.utility.MiscUtils.*;
 
 public class onBlockMine implements Listener {
     @EventHandler
@@ -43,8 +36,8 @@ public class onBlockMine implements Listener {
             //Redstone!
             int increase = 0;
             if(heldItem.getItemMeta() != null){
-                if(pdc.has(heldItem, "enchantments") && getCustomEnchantments(heldItem).containsKey("harvest")){
-                    int harvestLevel = getCustomEnchantments(heldItem).get("harvest");
+                if(PDCUtils.has(heldItem, "enchantments") && ItemStackUtils.getCustomEnchantments(heldItem).containsKey("harvest")){
+                    int harvestLevel = ItemStackUtils.getCustomEnchantments(heldItem).get("harvest");
                     increase += harvestLevel;
                     int extra = max(harvestLevel / 2, 1);
                     if(percentChance(0.05 * harvestLevel)){
@@ -67,8 +60,8 @@ public class onBlockMine implements Listener {
             boolean dropHarvest = percentChance(0.01);
             if(dropHarvest){
                 ItemStack harvestBook = new ItemStack(Material.ENCHANTED_BOOK);
-                pdc.set(harvestBook, "enchantments", "harvest/1");
-                syncItem(harvestBook);
+                PDCUtils.set(harvestBook, "enchantments", "harvest/1");
+                ItemStackUtils.syncItem(harvestBook);
                 player.sendMessage(ChatColor.LIGHT_PURPLE + "RARE DROP! " + ChatColor.GRAY + "Harvest I");
                 giveItem(player, harvestBook, 1);
             }
@@ -79,8 +72,8 @@ public class onBlockMine implements Listener {
             }
             checkQuest("mine", "crops", player, 1);
 
-            if(getCustomEnchantments(heldItem).containsKey("bountiful")){
-                int level = getCustomEnchantments(heldItem).get("bountiful");
+            if(ItemStackUtils.getCustomEnchantments(heldItem).containsKey("bountiful")){
+                int level = ItemStackUtils.getCustomEnchantments(heldItem).get("bountiful");
                 if(!percentChance(level*0.01)){
                     return;
                 }

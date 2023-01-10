@@ -8,16 +8,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Objects;
 
+import static mc.analyzers.survivaladdons2.modifiers.Modifier.getById;
 import static mc.analyzers.survivaladdons2.tasks.SyncAttributes.materialAttributes;
-import static mc.analyzers.survivaladdons2.utility.utility.getAbsoluteId;
-import static mc.analyzers.survivaladdons2.utility.utility.syncItem;
+import static mc.analyzers.survivaladdons2.utility.ItemStackUtils.getAbsoluteId;
+import static mc.analyzers.survivaladdons2.utility.ItemStackUtils.syncItem;
 
 public class AttributeUtils {
     public static void syncAttributes(ItemStack item){
-        if(item != null && !pdc.has(item, "attributed") && !pdc.has(item, "id") && materialAttributes.containsKey(item.getType())){
+        if(item != null && !PDCUtils.has(item, "attributed") && !PDCUtils.has(item, "id") && materialAttributes.containsKey(item.getType())){
             String[] rawAttributes = materialAttributes.get(item.getType()).split(" ");
             for(String rawAttribute : rawAttributes){
                 String attribute = rawAttribute.split("/")[0];
@@ -25,8 +25,8 @@ public class AttributeUtils {
                 setAttribute(item, attribute, potency);
             }
             syncItem(item);
-            pdc.set(item, "attributed", "true");
-        }else if(pdc.has(item, "id") && materialAttributes.containsKey(pdc.get(item, "id")) && !pdc.has(item, "attributed")){
+            PDCUtils.set(item, "attributed", "true");
+        }else if(PDCUtils.has(item, "id") && materialAttributes.containsKey(PDCUtils.get(item, "id")) && !PDCUtils.has(item, "attributed")){
             String[] rawAttributes = materialAttributes.get(getAbsoluteId(item)).split(" ");
             for(String rawAttribute : rawAttributes){
                 String attribute = rawAttribute.split("/")[0];
@@ -34,7 +34,7 @@ public class AttributeUtils {
                 setAttribute(item, attribute, potency);
             }
             syncItem(item);
-            pdc.set(item, "attributed", "true");
+            PDCUtils.set(item, "attributed", "true");
         }
     }
     public static double[] getProtectionFactors(Player player){
@@ -108,10 +108,10 @@ public class AttributeUtils {
 
     public static String[] getAttributes(ItemStack item){
         StringBuilder attributes = new StringBuilder();
-        if(!pdc.has(item, "attributes") || pdc.get(item,"attributes").equals("")){
+        if(!PDCUtils.has(item, "attributes") || PDCUtils.get(item,"attributes").equals("")){
             return new String[]{};
         }
-        for(String attribute : pdc.get(item, "attributes").split(" ")){
+        for(String attribute : PDCUtils.get(item, "attributes").split(" ")){
             double potency = Double.parseDouble(attribute.split("/")[1]);
             if(potency != 0){
                 attributes.append(attribute).append("/").append(potency).append(" ");
@@ -121,8 +121,8 @@ public class AttributeUtils {
     }
     public static void setAttribute(ItemStack item, String attribute, double potency){
         ItemMeta meta = item.getItemMeta();
-        if(!pdc.has(item, "attributes")){
-            pdc.set(item, "attributes", attribute + "/" + potency + " ");
+        if(!PDCUtils.has(item, "attributes")){
+            PDCUtils.set(item, "attributes", attribute + "/" + potency + " ");
             return;
         }
         if(!(meta == null)){
@@ -145,36 +145,29 @@ public class AttributeUtils {
                         newAttributes.append(currentAttribute).append(" ");
                     }
                 }
-                pdc.set(item, "attributes", newAttributes.toString());
+                PDCUtils.set(item, "attributes", newAttributes.toString());
             }else{
                 //Doesn't have it
-                pdc.set(item, "attributes", pdc.get(item, "attributes") + attribute + "/" + potency + " ");
+                PDCUtils.set(item, "attributes", PDCUtils.get(item, "attributes") + attribute + "/" + potency + " ");
             }
         }
     }
 
     public static void mergeModifiers(ItemStack recipient, ItemStack modifier){
-        HashMap<String, ChatColor> colors = new HashMap<>();
-        colors.put("warden_heart", ChatColor.RED);
-        colors.put("feather_steel", ChatColor.YELLOW);
-        colors.put("fallen_star", ChatColor.AQUA);
-
-        HashMap<String, String> prettyName = new HashMap<>();
-        prettyName.put("warden_heart", "Loving");
-        prettyName.put("feather_steel", "Light");
-        prettyName.put("fallen_star", "Magical");
         //Reset attributes to default
-        pdc.set(recipient, "attributes", "");
+        PDCUtils.set(recipient, "attributes", "");
         String[] rawAttributes = SyncAttributes.materialAttributes.get(recipient.getType()).split(" ");
         for(String rawAttribute : rawAttributes){
             String attribute = rawAttribute.split("/")[0];
             double potency = Double.parseDouble(rawAttribute.split("/")[1]);
             setAttribute(recipient, attribute, potency);
         }
-        pdc.set(recipient, "attributed", "true");
+        PDCUtils.set(recipient, "attributed", "true");
 
-        String type = pdc.get(modifier, "modifier").split("/")[0];
-        String potency = pdc.get(modifier, "modifier").split("/")[1];
+        String id = PDCUtils.get(modifier, "id");
+        String type = getById(id).getAttribute().split("/")[0];
+        String potency = getById(id).getAttribute().split("/")[1];
+
         boolean has = false;
         double before = 0;
         for(String attr : getAttributes(recipient)){
@@ -190,13 +183,14 @@ public class AttributeUtils {
         }else {
             setAttribute(recipient, type, Double.parseDouble(potency));
         }
-        pdc.set(recipient, "currentAttributeModifier", pdc.get(modifier, "id"));
+        PDCUtils.set(recipient, "currentAttributeModifier", id);
         ItemMeta name = recipient.getItemMeta();
+
         StringBuilder vanillaName = new StringBuilder();
         for(String part : recipient.getType().name().split("_")){
             vanillaName.append(part.substring(0,1).toUpperCase() + part.substring(1).toLowerCase()).append(" ");
         }
-        name.setDisplayName(colors.get(pdc.get(modifier, "id")) + prettyName.get(pdc.get(modifier, "id")) + " " + ChatColor.WHITE + vanillaName);
+        name.setDisplayName(getById(id).getPrefix() + ChatColor.RESET + " " + ChatColor.WHITE + vanillaName);
         recipient.setItemMeta(name);
     }
 

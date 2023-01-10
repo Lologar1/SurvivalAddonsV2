@@ -1,7 +1,8 @@
 package mc.analyzers.survivaladdons2.events;
 
-import mc.analyzers.survivaladdons2.utility.DamagePlayer;
-import mc.analyzers.survivaladdons2.utility.pdc;
+import mc.analyzers.survivaladdons2.utility.ItemStackUtils;
+import mc.analyzers.survivaladdons2.utility.PDCUtils;
+import mc.analyzers.survivaladdons2.utility.PlayerUtils;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
@@ -32,19 +33,19 @@ import static java.lang.Math.nextAfter;
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.dustIcon;
 import static mc.analyzers.survivaladdons2.customenchantments.customEnchantmentsWrapper.*;
 import static mc.analyzers.survivaladdons2.customenchantments.customEnchantmentsWrapper.legendaryEnchantments;
-import static mc.analyzers.survivaladdons2.utility.utility.*;
+import static mc.analyzers.survivaladdons2.utility.MiscUtils.*;
 
 public class PlayerInteractEvent implements Listener {
     @EventHandler
     public void playerInteractEvent(org.bukkit.event.player.PlayerInteractEvent e){
         Player player = e.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
-        if(e.getItem() != null && pdc.has(e.getItem(), "doNotInteract")){
+        if(e.getItem() != null && PDCUtils.has(e.getItem(), "doNotInteract")){
             e.setCancelled(true);
         }
 
-        if(e.getAction().equals(Action.RIGHT_CLICK_AIR) && player.getInventory().getItemInMainHand().getType().equals(Material.KNOWLEDGE_BOOK) && pdc.has(player.getInventory().getItemInMainHand(), "id")){
-            if(!pdc.get(player.getInventory().getItemInMainHand(), "id").equals("tomeOfKnowledge")){
+        if(e.getAction().equals(Action.RIGHT_CLICK_AIR) && player.getInventory().getItemInMainHand().getType().equals(Material.KNOWLEDGE_BOOK) && PDCUtils.has(player.getInventory().getItemInMainHand(), "id")){
+            if(!PDCUtils.get(player.getInventory().getItemInMainHand(), "id").equals("tomeOfKnowledge")){
                 return;
             }
             e.setCancelled(true);
@@ -62,8 +63,8 @@ public class PlayerInteractEvent implements Listener {
             ItemMeta dustMeta = dustCost.getItemMeta();
             int cost = 25;
             String enchantment = "AnALYZERS IS THE BESTTT";
-            if(pdc.has(tome.getItem(22), "enchantments")){
-                enchantment = pdc.get(tome.getItem(22), "enchantments").split("/")[0];
+            if(PDCUtils.has(tome.getItem(22), "enchantments")){
+                enchantment = PDCUtils.get(tome.getItem(22), "enchantments").split("/")[0];
             }
 
             if (Arrays.asList(uncommonEnchantments).contains(enchantment)){
@@ -88,9 +89,9 @@ public class PlayerInteractEvent implements Listener {
             reroll.setItemMeta(rerollMeta);
 
             ItemStack oldEnchant = new ItemStack(Material.ENCHANTED_BOOK);
-            if(pdc.has(player, "oldTomeEnchantment") && !pdc.get(player, "oldTomeEnchantment").equals("none")){
-                pdc.set(oldEnchant, "enchantments", pdc.get(player, "oldTomeEnchantment") + "/1 ");
-                syncItem(oldEnchant);
+            if(PDCUtils.has(player, "oldTomeEnchantment") && !PDCUtils.get(player, "oldTomeEnchantment").equals("none")){
+                PDCUtils.set(oldEnchant, "enchantments", PDCUtils.get(player, "oldTomeEnchantment") + "/1 ");
+                ItemStackUtils.syncItem(oldEnchant);
             }else{
                 ItemStack combinedItem = new ItemStack(Material.BARRIER);
                 ItemMeta cm = combinedItem.getItemMeta();
@@ -107,13 +108,13 @@ public class PlayerInteractEvent implements Listener {
             return;
         }
 
-        if(pdc.has(item, "enchantments")){
-            if(getCustomEnchantments(item).containsKey("shortbow") && item.getType().equals(Material.BOW)){
+        if(PDCUtils.has(item, "enchantments")){
+            if(ItemStackUtils.getCustomEnchantments(item).containsKey("shortbow") && item.getType().equals(Material.BOW)){
                 e.setCancelled(true);
                 int shortbowCooldown = 0;
-                int cooldown = 4 - getCustomEnchantments(item).get("shortbow");
-                if(pdc.has(player, "shortbowCooldown")){
-                    shortbowCooldown = Integer.parseInt(pdc.get(player, "shortbowCooldown"));
+                int cooldown = 4 - ItemStackUtils.getCustomEnchantments(item).get("shortbow");
+                if(PDCUtils.has(player, "shortbowCooldown")){
+                    shortbowCooldown = Integer.parseInt(PDCUtils.get(player, "shortbowCooldown"));
                 }
                 if((System.currentTimeMillis()/1000 - shortbowCooldown) >= cooldown ){
                     boolean hasArrows = false;
@@ -129,7 +130,7 @@ public class PlayerInteractEvent implements Listener {
                     if(!hasArrows){
                         return;
                     }
-                    pdc.set(player, "shortbowCooldown", String.valueOf(System.currentTimeMillis()/1000));
+                    PDCUtils.set(player, "shortbowCooldown", String.valueOf(System.currentTimeMillis()/1000));
                     Location loc = player.getEyeLocation();
                     Arrow arrow = player.launchProjectile(Arrow.class);
                     arrow.setVelocity(loc.getDirection().normalize().multiply(2.5));
@@ -156,55 +157,55 @@ public class PlayerInteractEvent implements Listener {
                         }
                     }
                 }else{
-                    String remaining = String.valueOf(cooldown - (System.currentTimeMillis()/1000 - Integer.parseInt(pdc.get(player, "shortbowCooldown"))));
+                    String remaining = String.valueOf(cooldown - (System.currentTimeMillis()/1000 - Integer.parseInt(PDCUtils.get(player, "shortbowCooldown"))));
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Shortbow Cooldown! " + ChatColor.GRAY + "(" + remaining + "s)"));
                 }
             }
         }
 
-        if(pdc.has(item, "id")){
-            switch (pdc.get(item, "id")){
+        if(PDCUtils.has(item, "id")){
+            switch (PDCUtils.get(item, "id")){
                 case "healing_stick":
-                    int potency = Integer.parseInt(pdc.get(item, "healing"));
-                    if(Integer.parseInt(pdc.get(player, "dust")) >= (potency+1)){
+                    int potency = Integer.parseInt(PDCUtils.get(item, "healing"));
+                    if(Integer.parseInt(PDCUtils.get(player, "dust")) >= (potency+1)){
                         int tpCooldown = 0;
-                        if(pdc.has(player, "stickCooldown")){
-                            tpCooldown = Integer.parseInt(pdc.get(player, "stickCooldown"));
+                        if(PDCUtils.has(player, "stickCooldown")){
+                            tpCooldown = Integer.parseInt(PDCUtils.get(player, "stickCooldown"));
                         }
                         if((System.currentTimeMillis()/1000 - tpCooldown) >= 5){
-                            pdc.set(player, "stickCooldown", String.valueOf(System.currentTimeMillis()/1000));
+                            PDCUtils.set(player, "stickCooldown", String.valueOf(System.currentTimeMillis()/1000));
                             player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "HEAL! " + ChatColor.RESET + ChatColor.GRAY + "for " + potency + " hearts.");
                             player.setHealth(min(player.getHealth() + 2*potency, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
                             player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 2);
-                            pdc.set(player, "dust", String.valueOf(Integer.parseInt(pdc.get(player, "dust")) - (potency+1)));
+                            PDCUtils.set(player, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(player, "dust")) - (potency+1)));
                         }else{
-                            String remaining = String.valueOf(5 - (System.currentTimeMillis()/1000 - Integer.parseInt(pdc.get(player, "stickCooldown"))));
+                            String remaining = String.valueOf(5 - (System.currentTimeMillis()/1000 - Integer.parseInt(PDCUtils.get(player, "stickCooldown"))));
                             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Stick Cooldown! " + ChatColor.GRAY + "(" + remaining + "s)"));
                         }
                     }
                     break;
                 case "food_stick":
-                    potency = Integer.parseInt(pdc.get(item, "food"));
-                    if(Integer.parseInt(pdc.get(player, "dust")) >= potency){
+                    potency = Integer.parseInt(PDCUtils.get(item, "food"));
+                    if(Integer.parseInt(PDCUtils.get(player, "dust")) >= potency){
                         int tpCooldown = 0;
-                        if(pdc.has(player, "stickCooldown")){
-                            tpCooldown = Integer.parseInt(pdc.get(player, "stickCooldown"));
+                        if(PDCUtils.has(player, "stickCooldown")){
+                            tpCooldown = Integer.parseInt(PDCUtils.get(player, "stickCooldown"));
                         }
                         if((System.currentTimeMillis()/1000 - tpCooldown) >= 5){
-                            pdc.set(player, "stickCooldown", String.valueOf(System.currentTimeMillis()/1000));
+                            PDCUtils.set(player, "stickCooldown", String.valueOf(System.currentTimeMillis()/1000));
                             player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "EAT! " + ChatColor.RESET + ChatColor.GRAY + "for " + potency*6 + " satruation.");
                             player.setFoodLevel(min(player.getFoodLevel() + potency*6, 20));
                             player.setSaturation(2);
                             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_BURP, 1, 1);
-                            pdc.set(player, "dust", String.valueOf(Integer.parseInt(pdc.get(player, "dust")) - potency));
+                            PDCUtils.set(player, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(player, "dust")) - potency));
                         }else{
-                            String remaining = String.valueOf(5 - (System.currentTimeMillis()/1000 - Integer.parseInt(pdc.get(player, "stickCooldown"))));
+                            String remaining = String.valueOf(5 - (System.currentTimeMillis()/1000 - Integer.parseInt(PDCUtils.get(player, "stickCooldown"))));
                             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Stick Cooldown! " + ChatColor.GRAY + "(" + remaining + "s)"));
                         }
                     }
                     break;
                 case "fling_stick":
-                    potency = Integer.parseInt(pdc.get(item, "fling"));
+                    potency = Integer.parseInt(PDCUtils.get(item, "fling"));
                     if(e.getAction().equals(Action.LEFT_CLICK_AIR)){
                         Vector velo = player.getVelocity();
                         velo.setY(velo.getY() + 2);
@@ -215,16 +216,16 @@ public class PlayerInteractEvent implements Listener {
                     break;
                 case "ice_wand":
                     int tpCooldown = 0;
-                    if(pdc.has(player, "wandCooldown")){
-                        tpCooldown = Integer.parseInt(pdc.get(player, "wandCooldown"));
+                    if(PDCUtils.has(player, "wandCooldown")){
+                        tpCooldown = Integer.parseInt(PDCUtils.get(player, "wandCooldown"));
                     }
                     if((System.currentTimeMillis()/1000 - tpCooldown) >= 10){
-                        if(Integer.parseInt(pdc.get(player, "dust")) >= 3){
-                            pdc.set(player, "dust", String.valueOf(Integer.parseInt(pdc.get(player, "dust")) - 3));
+                        if(Integer.parseInt(PDCUtils.get(player, "dust")) >= 3){
+                            PDCUtils.set(player, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(player, "dust")) - 3));
                         }else {
                             return;
                         }
-                        pdc.set(player, "wandCooldown", String.valueOf(System.currentTimeMillis()/1000));
+                        PDCUtils.set(player, "wandCooldown", String.valueOf(System.currentTimeMillis()/1000));
                         player.sendMessage(net.md_5.bungee.api.ChatColor.of("#68FBFB") + "" + ChatColor.BOLD + "MAGIC! " + ChatColor.RESET + ChatColor.GRAY + "cost " + net.md_5.bungee.api.ChatColor.RED + " 3 " + dustIcon + " dust.");
                         //Code for ice spray wand
                         player.getWorld().spawnParticle(Particle.CLOUD, player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(2)), 40, 0, 0, 0, 0.5);
@@ -238,14 +239,14 @@ public class PlayerInteractEvent implements Listener {
                             if(toDamage instanceof Player){
                                 //Magic Damage
                                 toDamage.sendMessage(net.md_5.bungee.api.ChatColor.of("#5F602D") + "" + ChatColor.BOLD + "SLOW!" + ChatColor.RESET + ChatColor.GRAY + " For 10 seconds because of " + ChatColor.BLUE + player.getDisplayName());
-                                DamagePlayer.dealDamage((Player) toDamage, 0, 7, EntityDamageEvent.DamageCause.MAGIC);
+                                PlayerUtils.dealDamage((Player) toDamage, 0, 7, EntityDamageEvent.DamageCause.MAGIC);
                             }else {
                                 //Normal damage
                                 ((LivingEntity) toDamage).damage(7, player);
                             }
                         }
                     }else{
-                        String remaining = String.valueOf(10 - (System.currentTimeMillis()/1000 - Integer.parseInt(pdc.get(player, "wandCooldown"))));
+                        String remaining = String.valueOf(10 - (System.currentTimeMillis()/1000 - Integer.parseInt(PDCUtils.get(player, "wandCooldown"))));
                         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Wand Cooldown! " + ChatColor.GRAY + "(" + remaining + "s)"));
                     }
                     break;

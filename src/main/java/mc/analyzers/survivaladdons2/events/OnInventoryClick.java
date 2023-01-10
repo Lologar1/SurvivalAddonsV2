@@ -34,8 +34,9 @@ import static mc.analyzers.survivaladdons2.shop.ShopItem.getByMaterial;
 import static mc.analyzers.survivaladdons2.utility.AttributeUtils.mergeModifiers;
 import static mc.analyzers.survivaladdons2.utility.AttributeUtils.setAttribute;
 import static mc.analyzers.survivaladdons2.customenchantments.customEnchantmentsWrapper.*;
-import static mc.analyzers.survivaladdons2.utility.itemList.item;
-import static mc.analyzers.survivaladdons2.utility.utility.*;
+import static mc.analyzers.survivaladdons2.utility.PlayerUtils.giveItem;
+import static mc.analyzers.survivaladdons2.utility.ItemList.item;
+import static mc.analyzers.survivaladdons2.utility.MiscUtils.*;
 
 public class OnInventoryClick implements Listener {
     @EventHandler
@@ -117,9 +118,9 @@ public class OnInventoryClick implements Listener {
             int dustCost = 0;
             //Custom handling : ench & modif.
             boolean canCraft = false;
-            String absoluteID = utility.getAbsoluteId(item1);
+            String absoluteID = ItemStackUtils.getAbsoluteId(item1);
             if (customAnvilCrafts.crafts.containsKey(absoluteID)) {
-                if (Arrays.asList(customAnvilCrafts.crafts.get(absoluteID)).contains(getAbsoluteId(item2))){
+                if (Arrays.asList(customAnvilCrafts.crafts.get(absoluteID)).contains(ItemStackUtils.getAbsoluteId(item2))){
                     //Match found - > only for attributs though, customEnch items : put them on directly
                     canCraft = true;
                 }
@@ -136,38 +137,38 @@ public class OnInventoryClick implements Listener {
                 item2ench = meta.getStoredEnchants();
             }
 
-            combinedItem = combineAllEnchantments(item1, item2, item1ench, item2ench);
+            combinedItem = ItemStackUtils.combineAllEnchantments(item1, item2, item1ench, item2ench);
 
             //re-evaluate dust cost
             if (item1.getType().equals(Material.ENCHANTED_BOOK) || item2.getType().equals(Material.ENCHANTED_BOOK)) {
-                if (!(pdc.has(item1, "id") || pdc.has(item2, "id"))) {
+                if (!(PDCUtils.has(item1, "id") || PDCUtils.has(item2, "id"))) {
                     dustCost += 10;
                 }
             }
-            if ((!(pdc.has(item1, "id") || pdc.has(item2, "id"))) && item1.getType().equals(item2.getType()) && !item1.getType().equals(Material.ENCHANTED_BOOK) && !item1.getType().equals(Material.AIR)) {
+            if ((!(PDCUtils.has(item1, "id") || PDCUtils.has(item2, "id"))) && item1.getType().equals(item2.getType()) && !item1.getType().equals(Material.ENCHANTED_BOOK) && !item1.getType().equals(Material.AIR)) {
                 dustCost += 15;
             }
-            dustCost = dustCost + (getCustomEnchantments(combinedItem).size() * 7 + combinedItem.getEnchantments().size() * 4);
-            if (pdc.has(item1, "id")) {
-                dustCost += utility.getCustomDustCost(pdc.get(item1, "id"));
+            dustCost = dustCost + (ItemStackUtils.getCustomEnchantments(combinedItem).size() * 7 + combinedItem.getEnchantments().size() * 4);
+            if (PDCUtils.has(item1, "id")) {
+                dustCost += ItemStackUtils.getCustomDustCost(PDCUtils.get(item1, "id"));
             }
-            if (pdc.has(item2, "id")) {
-                dustCost += utility.getCustomDustCost(pdc.get(item2, "id"));
+            if (PDCUtils.has(item2, "id")) {
+                dustCost += ItemStackUtils.getCustomDustCost(PDCUtils.get(item2, "id"));
             }
             ItemStack price = new ItemStack(Material.REDSTONE);
             ItemMeta pricemeta = price.getItemMeta();
             pricemeta.setDisplayName(ChatColor.GOLD + "Total cost: " + ChatColor.RED + dustCost + dustIcon + " dust");
             price.setItemMeta(pricemeta);
-            pdc.set(price, "price", String.valueOf(dustCost));
+            PDCUtils.set(price, "price", String.valueOf(dustCost));
             anvil.setItem(4, price);
 
             //Attribute modifiers
-            if(pdc.has(item2, "modifier") && pdc.has(item1, "attributes")){
+            if(PDCUtils.has(item2, "id") && mc.analyzers.survivaladdons2.modifiers.Modifier.getById(PDCUtils.get(item2, "id")) != null){
                 mergeModifiers(combinedItem, item2);
                 canCraft = true;
             }
 
-            syncItem(combinedItem);
+            ItemStackUtils.syncItem(combinedItem);
 
             if(combinedItem.equals(item1)){
                 combinedItem = new ItemStack(Material.BARRIER);
@@ -182,9 +183,9 @@ public class OnInventoryClick implements Listener {
             cm.setDisplayName(ChatColor.RED + "Put two valid items to combine!");
             bar.setItemMeta(cm);
             if (((item1.getType().getMaxDurability() != 0 && item2.getType().getMaxDurability() != 0) && item1.getType().equals(item2.getType())) || (item1.getType().equals(Material.ENCHANTED_BOOK) && item2.getType().equals(Material.ENCHANTED_BOOK))
-                    || (pdc.has(item1, "id") && pdc.has(item2, "id")) || (pdc.has(item2, "id") && item1.getType().getMaxDurability() != 0) ||
-                    (item1.getType().getMaxDurability() != 0 && item2.getType().equals(Material.ENCHANTED_BOOK)) || (pdc.has(item1, "id") && item2.getType().getMaxDurability() != 0)
-                    || canCraft || (pdc.has(item1, "id") && item2.getType().equals(Material.ENCHANTED_BOOK)) || (pdc.has(item2, "id") && item1.getType().equals(Material.ENCHANTED_BOOK))) {
+                    || (PDCUtils.has(item1, "id") && PDCUtils.has(item2, "id")) || (PDCUtils.has(item2, "id") && item1.getType().getMaxDurability() != 0) ||
+                    (item1.getType().getMaxDurability() != 0 && item2.getType().equals(Material.ENCHANTED_BOOK)) || (PDCUtils.has(item1, "id") && item2.getType().getMaxDurability() != 0)
+                    || canCraft || (PDCUtils.has(item1, "id") && item2.getType().equals(Material.ENCHANTED_BOOK)) || (PDCUtils.has(item2, "id") && item1.getType().equals(Material.ENCHANTED_BOOK))) {
                 if (((item1.getType().getMaxDurability() != 0 && item2.getType().getMaxDurability() != 0) && item1.getType().equals(item2.getType())) || (item1.getType().equals(Material.ENCHANTED_BOOK) && item2.getType().equals(Material.ENCHANTED_BOOK)
                         || (item1.getType().getMaxDurability() != 0 && item2.getType().equals(Material.ENCHANTED_BOOK)))) {
                     anvil.setItem(24, combinedItem);
@@ -210,8 +211,8 @@ public class OnInventoryClick implements Listener {
                         player.sendMessage(ChatColor.RED + "Provide appropriate ingredients!");
                         return;
                     }
-                    if (Integer.parseInt(pdc.get(player, "dust")) >= dustCost && anvil.getItem(24) != null) {
-                        pdc.set(player, "dust", String.valueOf(Integer.parseInt(pdc.get(player, "dust")) - dustCost));
+                    if (Integer.parseInt(PDCUtils.get(player, "dust")) >= dustCost && anvil.getItem(24) != null) {
+                        PDCUtils.set(player, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(player, "dust")) - dustCost));
                         player.sendMessage(ChatColor.GREEN + "Successfully combined for " + ChatColor.RED + dustCost + dustIcon + " dust.");
 
                         anvil.getItem(20).setAmount(anvil.getItem(20).getAmount() - 1);
@@ -234,19 +235,19 @@ public class OnInventoryClick implements Listener {
                     return;
                 }
                 ItemStack grindedItem = new ItemStack(e.getInventory().getItem(13));
-                pdc.set(grindedItem, "enchantments", "");
+                PDCUtils.set(grindedItem, "enchantments", "");
                 String[] rawAttributes = SyncAttributes.materialAttributes.get(grindedItem.getType()).split(" ");
-                pdc.set(grindedItem, "attributes", "");
+                PDCUtils.set(grindedItem, "attributes", "");
                 for(String rawAttribute : rawAttributes){
                     String attribute = rawAttribute.split("/")[0];
                     double potency = Double.parseDouble(rawAttribute.split("/")[1]);
                     setAttribute(grindedItem, attribute, potency);
                 }
-                pdc.set(grindedItem, "attributed", "true");
+                PDCUtils.set(grindedItem, "attributed", "true");
                 for(Enchantment enchantment : grindedItem.getEnchantments().keySet()){
                     grindedItem.removeEnchantment(enchantment);
                 }
-                syncItem(grindedItem);
+                ItemStackUtils.syncItem(grindedItem);
                 e.getInventory().setItem(13, grindedItem);
                 player.playSound(player.getLocation(), Sound.BLOCK_GRINDSTONE_USE, 1, 1);
             }
@@ -257,12 +258,12 @@ public class OnInventoryClick implements Listener {
             }
             if (e.getSlot() == 15) {
                 //Reroll
-                if (!(Integer.parseInt(pdc.get(player, "dust")) >= 2)) {
+                if (!(Integer.parseInt(PDCUtils.get(player, "dust")) >= 2)) {
                     player.sendMessage(ChatColor.RED + "Not enough dust!");
                     return;
                 }
                 int random = (int) (Math.random() * 100);
-                pdc.set(player, "dust", String.valueOf(Integer.parseInt(pdc.get(player, "dust")) - 2));
+                PDCUtils.set(player, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(player, "dust")) - 2));
                 /*
                 Common (50%) 25 dust, 10 lapis
                 Uncommon (20%) 40 dust, 20 lapis
@@ -272,7 +273,7 @@ public class OnInventoryClick implements Listener {
                  */
                 String current = "";
                 if(!tome.getItem(22).getType().equals(Material.BARRIER)){
-                    current = pdc.get(tome.getItem(22), "enchantments").split("/")[0];
+                    current = PDCUtils.get(tome.getItem(22), "enchantments").split("/")[0];
                 }
 
                 if (random <= 50) {
@@ -282,9 +283,9 @@ public class OnInventoryClick implements Listener {
                         pickedEnchant = getRandom(commonEnchantments);
                     } while (pickedEnchant.equals(current));
                     ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
-                    pdc.set(book, "enchantments", pickedEnchant + "/1 ");
-                    pdc.set(player, "oldTomeEnchantment", pickedEnchant);
-                    syncItem(book);
+                    PDCUtils.set(book, "enchantments", pickedEnchant + "/1 ");
+                    PDCUtils.set(player, "oldTomeEnchantment", pickedEnchant);
+                    ItemStackUtils.syncItem(book);
 
                     ItemStack dustCost = new ItemStack(Material.REDSTONE);
                     ItemMeta dustMeta = dustCost.getItemMeta();
@@ -302,9 +303,9 @@ public class OnInventoryClick implements Listener {
                         pickedEnchant = getRandom(uncommonEnchantments);
                     } while (pickedEnchant.equals(current));
                     ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
-                    pdc.set(book, "enchantments", pickedEnchant + "/1 ");
-                    pdc.set(player, "oldTomeEnchantment", pickedEnchant);
-                    syncItem(book);
+                    PDCUtils.set(book, "enchantments", pickedEnchant + "/1 ");
+                    PDCUtils.set(player, "oldTomeEnchantment", pickedEnchant);
+                    ItemStackUtils.syncItem(book);
 
                     ItemStack dustCost = new ItemStack(Material.REDSTONE);
                     ItemMeta dustMeta = dustCost.getItemMeta();
@@ -322,9 +323,9 @@ public class OnInventoryClick implements Listener {
                         pickedEnchant = getRandom(rareEnchantments);
                     } while (pickedEnchant.equals(current));
                     ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
-                    pdc.set(book, "enchantments", pickedEnchant + "/1 ");
-                    pdc.set(player, "oldTomeEnchantment", pickedEnchant);
-                    syncItem(book);
+                    PDCUtils.set(book, "enchantments", pickedEnchant + "/1 ");
+                    PDCUtils.set(player, "oldTomeEnchantment", pickedEnchant);
+                    ItemStackUtils.syncItem(book);
 
                     ItemStack dustCost = new ItemStack(Material.REDSTONE);
                     ItemMeta dustMeta = dustCost.getItemMeta();
@@ -342,9 +343,9 @@ public class OnInventoryClick implements Listener {
                         pickedEnchant = getRandom(epicEnchantments);
                     } while (pickedEnchant.equals(current));
                     ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
-                    pdc.set(book, "enchantments", pickedEnchant + "/1 ");
-                    pdc.set(player, "oldTomeEnchantment", pickedEnchant);
-                    syncItem(book);
+                    PDCUtils.set(book, "enchantments", pickedEnchant + "/1 ");
+                    PDCUtils.set(player, "oldTomeEnchantment", pickedEnchant);
+                    ItemStackUtils.syncItem(book);
 
                     ItemStack dustCost = new ItemStack(Material.REDSTONE);
                     ItemMeta dustMeta = dustCost.getItemMeta();
@@ -362,9 +363,9 @@ public class OnInventoryClick implements Listener {
                         pickedEnchant = getRandom(legendaryEnchantments);
                     } while (pickedEnchant.equals(current));
                     ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
-                    pdc.set(book, "enchantments", pickedEnchant + "/1 ");
-                    pdc.set(player, "oldTomeEnchantment", pickedEnchant);
-                    syncItem(book);
+                    PDCUtils.set(book, "enchantments", pickedEnchant + "/1 ");
+                    PDCUtils.set(player, "oldTomeEnchantment", pickedEnchant);
+                    ItemStackUtils.syncItem(book);
 
                     ItemStack dustCost = new ItemStack(Material.REDSTONE);
                     ItemMeta dustMeta = dustCost.getItemMeta();
@@ -383,7 +384,7 @@ public class OnInventoryClick implements Listener {
                 }
                 int lapisAmount = 10;
                 int dustCost = 25;
-                String enchantment = pdc.get(tome.getItem(22), "enchantments").split("/")[0];
+                String enchantment = PDCUtils.get(tome.getItem(22), "enchantments").split("/")[0];
                 if (Arrays.asList(uncommonEnchantments).contains(enchantment)){
                     dustCost = 40;
                     lapisAmount = 20;
@@ -398,7 +399,7 @@ public class OnInventoryClick implements Listener {
                     lapisAmount = 64;
                 }
 
-                if(Integer.parseInt(pdc.get(player, "dust")) >= dustCost ){
+                if(Integer.parseInt(PDCUtils.get(player, "dust")) >= dustCost ){
                     if(tome.getItem(11) == null){
                         player.sendMessage(ChatColor.RED + "Provide at least " + lapisAmount + " lapis lazuli!");
                         return;
@@ -412,7 +413,7 @@ public class OnInventoryClick implements Listener {
                     tome.setItem(11, lapis);
                     player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1, 1);
 
-                    pdc.set(player, "dust", String.valueOf(Integer.parseInt(pdc.get(player, "dust")) - dustCost));
+                    PDCUtils.set(player, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(player, "dust")) - dustCost));
                     giveItem(player, tome.getItem(22), 1);
                     ItemStack combinedItem = new ItemStack(Material.BARRIER);
                     ItemMeta cm = combinedItem.getItemMeta();
@@ -420,7 +421,7 @@ public class OnInventoryClick implements Listener {
                     combinedItem.setItemMeta(cm);
                     tome.setItem(22, combinedItem);
                     checkQuest("get", "custom enchant", player, 1);
-                    pdc.set(player, "oldTomeEnchantment", "none");
+                    PDCUtils.set(player, "oldTomeEnchantment", "none");
                 }else {
                     player.sendMessage(ChatColor.RED + "Not enough dust!");
                 }
@@ -447,7 +448,7 @@ public class OnInventoryClick implements Listener {
             }
             PotionMeta recipientMeta = (PotionMeta) recipient.getItemMeta();
             List<PotionEffect> effects = recipientMeta.getCustomEffects();
-            if(pdc.has(recipient, "doNotBrew")){
+            if(PDCUtils.has(recipient, "doNotBrew")){
                 player.sendMessage(ChatColor.RED + "Cannot add effects to this item!");
                 return;
             }
@@ -464,7 +465,7 @@ public class OnInventoryClick implements Listener {
                 return;
             }
             if(ingredient.getType().equals(Material.REDSTONE) || ingredient.getType().equals(Material.GLOWSTONE_DUST) || ingredient.getType().equals(Material.GUNPOWDER) || ingredient.getType().equals(Material.DRAGON_BREATH) || ingredient.getType().equals(Material.FERMENTED_SPIDER_EYE)){
-                if(effects.isEmpty() && !pdc.has(recipient, "effects")){
+                if(effects.isEmpty() && !PDCUtils.has(recipient, "effects")){
                     player.sendMessage(ChatColor.RED + "Recipient needs to have a potion effect to apply this modifier !");
                     return;
                 }
@@ -473,23 +474,23 @@ public class OnInventoryClick implements Listener {
                 boolean upgraded = false;
                 boolean corrupt = false;
                 boolean isCustom = false;
-                if(pdc.has(recipient, "id")){
+                if(PDCUtils.has(recipient, "id")){
                     isCustom=true;
                 }
                 String name = recipientMeta.getDisplayName();
                 switch (ingredient.getType()){
                     case REDSTONE:
-                        if(pdc.has(recipient, "upgraded")){
+                        if(PDCUtils.has(recipient, "upgraded")){
                             player.sendMessage(ChatColor.RED + "Already upgraded once !");
                             return;
                         }
                         if(isCustom){
-                            String rawEffect = pdc.get(recipient, "effects");
+                            String rawEffect = PDCUtils.get(recipient, "effects");
                             String effectName = rawEffect.split("/")[0];
                             int potency = Integer.parseInt(rawEffect.split("/")[1]);
                             int duration = Integer.parseInt(rawEffect.split("/")[2]);
                             duration = duration*2;
-                            pdc.set(recipient, "effects", effectName + "/" + potency + "/" + duration);
+                            PDCUtils.set(recipient, "effects", effectName + "/" + potency + "/" + duration);
                             ArrayList<String> lore = new ArrayList<>();
                             lore.add(ChatColor.BLUE + effectName.substring(0, 1).toUpperCase() + effectName.substring(1) + " " + roman(potency) + " (" + (int) duration/60 + ":" + (int) duration%60 +")");
                             recipientMeta.setLore(lore);
@@ -503,18 +504,18 @@ public class OnInventoryClick implements Listener {
                         upgraded = true;
                         break;
                     case GLOWSTONE_DUST:
-                        if(pdc.has(recipient, "upgraded")){
+                        if(PDCUtils.has(recipient, "upgraded")){
                             player.sendMessage(ChatColor.RED + "Already upgraded once !");
                             return;
                         }
                         if(isCustom){
-                            String rawEffect = pdc.get(recipient, "effects");
+                            String rawEffect = PDCUtils.get(recipient, "effects");
                             String effectName = rawEffect.split("/")[0];
                             int potency = Integer.parseInt(rawEffect.split("/")[1]);
                             int duration = Integer.parseInt(rawEffect.split("/")[2]);
                             potency = potency + 1;
                             duration = duration/2;
-                            pdc.set(recipient, "effects", effectName + "/" + potency + "/" + duration);
+                            PDCUtils.set(recipient, "effects", effectName + "/" + potency + "/" + duration);
                             ArrayList<String> lore = new ArrayList<>();
                             lore.add(ChatColor.BLUE + effectName.substring(0, 1).toUpperCase() + effectName.substring(1) + " " + roman(potency) + " (" + (int) duration/60 + ":" + (int) duration%60 +")");
                             recipientMeta.setLore(lore);
@@ -545,7 +546,7 @@ public class OnInventoryClick implements Listener {
                         if(isCustom){
                             player.sendMessage(ChatColor.RED + "Can't apply this modifier to this item!");
                         }
-                        if(pdc.has(recipient, "corrupt")){
+                        if(PDCUtils.has(recipient, "corrupt")){
                             player.sendMessage(ChatColor.RED + "Already corrupted !");
                             return;
                         }
@@ -578,10 +579,10 @@ public class OnInventoryClick implements Listener {
                 recipientMeta.setDisplayName(name);
                 recipient.setItemMeta(recipientMeta);
                 if(upgraded){
-                    pdc.set(recipient, "upgraded", "true/1");
+                    PDCUtils.set(recipient, "upgraded", "true/1");
                 }
                 if(corrupt){
-                    pdc.set(recipient, "corrupt", "true/1");
+                    PDCUtils.set(recipient, "corrupt", "true/1");
                 }
                 player.playSound(player.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, 1, 1);
                 player.sendMessage(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "BREW! " + ChatColor.RESET + ChatColor.GRAY + "Potion successful!");
@@ -658,9 +659,9 @@ public class OnInventoryClick implements Listener {
                 case SWEET_BERRIES:
                     //sussyberry
                     name = ChatColor.DARK_AQUA + "Sussy ";
-                    PotionEffectType[] possible = new PotionEffectType[]{PotionEffectType.ABSORPTION, PotionEffectType.DAMAGE_RESISTANCE, PotionEffectType.HERO_OF_THE_VILLAGE, PotionEffectType.FAST_DIGGING, PotionEffectType.WEAKNESS, PotionEffectType.BAD_OMEN, PotionEffectType.WITHER, PotionEffectType.SLOW, PotionEffectType.SATURATION, PotionEffectType.SPEED};
+                    PotionEffectType[] possible = new PotionEffectType[]{PotionEffectType.CONFUSION, PotionEffectType.GLOWING, PotionEffectType.LEVITATION, PotionEffectType.DOLPHINS_GRACE, PotionEffectType.ABSORPTION, PotionEffectType.DAMAGE_RESISTANCE, PotionEffectType.HERO_OF_THE_VILLAGE, PotionEffectType.FAST_DIGGING, PotionEffectType.WEAKNESS, PotionEffectType.BAD_OMEN, PotionEffectType.WITHER, PotionEffectType.SLOW, PotionEffectType.SATURATION, PotionEffectType.SPEED};
                     PotionEffectType picked = possible[new Random().nextInt(possible.length)];
-                    newEffect = new PotionEffect(picked, 6000, 2);
+                    newEffect = new PotionEffect(picked, 1200, 2);
                     player.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "SUSSY! " + ChatColor.GRAY + "Got " + picked.getName().substring(0, 1).toUpperCase() + picked.getName().substring(1));
                     break;
             }
@@ -674,8 +675,8 @@ public class OnInventoryClick implements Listener {
                 recipientMeta.setLore(customlore);
                 recipientMeta.addCustomEffect(newEffect, true);
                 recipient.setItemMeta(recipientMeta);
-                pdc.set(recipient, "id", id);
-                pdc.set(recipient, "effects", customEffect);
+                PDCUtils.set(recipient, "id", id);
+                PDCUtils.set(recipient, "effects", customEffect);
             }else {
                 recipientMeta.addCustomEffect(newEffect, true);
                 recipient.setItemMeta(recipientMeta);
@@ -685,26 +686,26 @@ public class OnInventoryClick implements Listener {
             if(e.getSlot() == 11){
                 //Hourly
                 boolean alreadyDone = true;
-                if(!pdc.get(player, "hourlyLast").equals("active")){
-                    long lastDid = Long.parseLong(pdc.get(player,"hourlyLast"));
+                if(!PDCUtils.get(player, "hourlyLast").equals("active")){
+                    long lastDid = Long.parseLong(PDCUtils.get(player,"hourlyLast"));
                     if(lastDid + Quests.hourlyQuest.getDelay() <= System.currentTimeMillis()){
                         alreadyDone = false;
                     }
                 }
-                if(!pdc.get(player, "activeHourlyQuest").equals("null") || alreadyDone){
+                if(!PDCUtils.get(player, "activeHourlyQuest").equals("null") || alreadyDone){
                     player.sendMessage(ChatColor.RED + "Can't do a quest at this time!");
                     return;
                 }
-                if(!pdc.get(player, "currentQuestType").equals("none")){
-                    String lastType = pdc.get(player, "currentQuestType");
-                    pdc.set(player, lastType + "QuestProgress", "0/1234");
-                    pdc.set(player, lastType + "Last", "0");
-                    pdc.set(player, "active" + capFirst(lastType) + "Quest", "null");
+                if(!PDCUtils.get(player, "currentQuestType").equals("none")){
+                    String lastType = PDCUtils.get(player, "currentQuestType");
+                    PDCUtils.set(player, lastType + "QuestProgress", "0/1234");
+                    PDCUtils.set(player, lastType + "Last", "0");
+                    PDCUtils.set(player, "active" + capFirst(lastType) + "Quest", "null");
                 }
                 Quest hourly = Quests.hourlyQuest;
                 String picked = hourly.getRandomQuestId();
-                if(!pdc.get(player, "deactivatedHourlyQuest").equals("null")){
-                    picked = pdc.get(player, "deactivatedHourlyQuest");
+                if(!PDCUtils.get(player, "deactivatedHourlyQuest").equals("null")){
+                    picked = PDCUtils.get(player, "deactivatedHourlyQuest");
                 }
                 ItemStack hourlyQuest = new ItemStack(Material.WRITABLE_BOOK);
                 ItemMeta hourlyMeta = hourlyQuest.getItemMeta();
@@ -714,36 +715,36 @@ public class OnInventoryClick implements Listener {
                 hourlyMeta.setLore(hourlyLore);
                 hourlyQuest.setItemMeta(hourlyMeta);
 
-                pdc.set(player, "hourlyQuestProgress", "0/" + picked.split("/")[1]);
-                pdc.set(player, "activeHourlyQuest", picked);
-                pdc.set(player, "hourlyLast", "active");
-                pdc.set(player, "currentQuestType", "hourly");
-                pdc.set(player, "deactivatedHourlyQuest", picked);
+                PDCUtils.set(player, "hourlyQuestProgress", "0/" + picked.split("/")[1]);
+                PDCUtils.set(player, "activeHourlyQuest", picked);
+                PDCUtils.set(player, "hourlyLast", "active");
+                PDCUtils.set(player, "currentQuestType", "hourly");
+                PDCUtils.set(player, "deactivatedHourlyQuest", picked);
 
                 e.getInventory().setItem(11, hourlyQuest);
             }else if(e.getSlot()==13){
                 //Daily
                 boolean alreadyDone = true;
-                if(!pdc.get(player, "dailyLast").equals("active")){
-                    long lastDid = Long.parseLong(pdc.get(player,"dailyLast"));
+                if(!PDCUtils.get(player, "dailyLast").equals("active")){
+                    long lastDid = Long.parseLong(PDCUtils.get(player,"dailyLast"));
                     if(lastDid + Quests.dailyQuest.getDelay() <= System.currentTimeMillis()){
                         alreadyDone = false;
                     }
                 }
-                if(!pdc.get(player, "activeDailyQuest").equals("null") || alreadyDone){
+                if(!PDCUtils.get(player, "activeDailyQuest").equals("null") || alreadyDone){
                     player.sendMessage(ChatColor.RED + "Can't do a quest at this time!");
                     return;
                 }
-                if(!pdc.get(player, "currentQuestType").equals("none")){
-                    String lastType = pdc.get(player, "currentQuestType");
-                    pdc.set(player, lastType + "QuestProgress", "0/1234");
-                    pdc.set(player, lastType + "Last", "0");
-                    pdc.set(player, "active" + capFirst(lastType) + "Quest", "null");
+                if(!PDCUtils.get(player, "currentQuestType").equals("none")){
+                    String lastType = PDCUtils.get(player, "currentQuestType");
+                    PDCUtils.set(player, lastType + "QuestProgress", "0/1234");
+                    PDCUtils.set(player, lastType + "Last", "0");
+                    PDCUtils.set(player, "active" + capFirst(lastType) + "Quest", "null");
                 }
                 Quest daily = Quests.dailyQuest;
                 String picked = daily.getRandomQuestId();
-                if(!pdc.get(player, "deactivatedDailyQuest").equals("null")){
-                    picked = pdc.get(player, "deactivatedDailyQuest");
+                if(!PDCUtils.get(player, "deactivatedDailyQuest").equals("null")){
+                    picked = PDCUtils.get(player, "deactivatedDailyQuest");
                 }
                 ItemStack dailyQuest = new ItemStack(Material.WRITABLE_BOOK);
                 ItemMeta dailyMeta = dailyQuest.getItemMeta();
@@ -753,35 +754,35 @@ public class OnInventoryClick implements Listener {
                 dailyMeta.setLore(dailyLore);
                 dailyQuest.setItemMeta(dailyMeta);
 
-                pdc.set(player, "dailyQuestProgress", "0/" + picked.split("/")[1]);
-                pdc.set(player, "activeDailyQuest", picked);
-                pdc.set(player, "dailyLast", "active");
-                pdc.set(player, "currentQuestType", "daily");
-                pdc.set(player, "deactivatedDailyQuest", picked);
+                PDCUtils.set(player, "dailyQuestProgress", "0/" + picked.split("/")[1]);
+                PDCUtils.set(player, "activeDailyQuest", picked);
+                PDCUtils.set(player, "dailyLast", "active");
+                PDCUtils.set(player, "currentQuestType", "daily");
+                PDCUtils.set(player, "deactivatedDailyQuest", picked);
 
                 e.getInventory().setItem(13, dailyQuest);
             }else if(e.getSlot()==15){
                 //Weekly
                 boolean alreadyDone = true;
-                if(!pdc.get(player, "weeklyLast").equals("active")){
-                    long lastDid = Long.parseLong(pdc.get(player,"weeklyLast"));
+                if(!PDCUtils.get(player, "weeklyLast").equals("active")){
+                    long lastDid = Long.parseLong(PDCUtils.get(player,"weeklyLast"));
                     if(lastDid + Quests.weeklyQuest.getDelay() <= System.currentTimeMillis()){
                         alreadyDone = false;
                     }
                 }
-                if(!pdc.get(player, "activeWeeklyQuest").equals("null") || alreadyDone){
+                if(!PDCUtils.get(player, "activeWeeklyQuest").equals("null") || alreadyDone){
                     player.sendMessage(ChatColor.RED + "Can't do a quest at this time!");
                     return;
                 }
-                if(!pdc.get(player, "currentQuestType").equals("none")){
-                    String lastType = pdc.get(player, "currentQuestType");
-                    pdc.set(player, lastType + "Last", "0");
-                    pdc.set(player, "active" + capFirst(lastType) + "Quest", "null");
+                if(!PDCUtils.get(player, "currentQuestType").equals("none")){
+                    String lastType = PDCUtils.get(player, "currentQuestType");
+                    PDCUtils.set(player, lastType + "Last", "0");
+                    PDCUtils.set(player, "active" + capFirst(lastType) + "Quest", "null");
                 }
                 Quest weekly = Quests.weeklyQuest;
                 String picked = weekly.getRandomQuestId();
-                if(!pdc.get(player, "deactivatedWeeklyQuest").equals("null")){
-                    picked = pdc.get(player, "deactivatedWeeklyQuest");
+                if(!PDCUtils.get(player, "deactivatedWeeklyQuest").equals("null")){
+                    picked = PDCUtils.get(player, "deactivatedWeeklyQuest");
                 }
                 ItemStack weeklyQuest = new ItemStack(Material.WRITABLE_BOOK);
                 ItemMeta weeklyMeta = weeklyQuest.getItemMeta();
@@ -791,11 +792,11 @@ public class OnInventoryClick implements Listener {
                 weeklyMeta.setLore(weeklyLore);
                 weeklyQuest.setItemMeta(weeklyMeta);
 
-                pdc.set(player, "weeklyQuestProgress", "0/" + picked.split("/")[1]);
-                pdc.set(player, "activeWeeklyQuest", picked);
-                pdc.set(player, "weeklyLast", "active");
-                pdc.set(player, "currentQuestType", "weekly");
-                pdc.set(player, "deactivatedWeeklyQuest", picked);
+                PDCUtils.set(player, "weeklyQuestProgress", "0/" + picked.split("/")[1]);
+                PDCUtils.set(player, "activeWeeklyQuest", picked);
+                PDCUtils.set(player, "weeklyLast", "active");
+                PDCUtils.set(player, "currentQuestType", "weekly");
+                PDCUtils.set(player, "deactivatedWeeklyQuest", picked);
 
                 e.getInventory().setItem(15, weeklyQuest);
             }
@@ -812,8 +813,8 @@ public class OnInventoryClick implements Listener {
                     ShopItem shopItem = getByMaterial(sold);
                     shop.setItem(e.getSlot(), new ItemStack(Material.AIR));
                     int price = shopItem.sellItem(sold.getAmount());
-                    pdc.set(player, "dust", String.valueOf(Integer.parseInt(pdc.get(player, "dust")) + price));
-                    player.sendMessage(ChatColor.GREEN + "Sold " + sold.getAmount() + " " + capFirst(getAbsoluteId(sold).replace('_', ' ').toLowerCase(Locale.ROOT)) + " for " + ChatColor.RED + price + " " + dustIcon + " dust.");
+                    PDCUtils.set(player, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(player, "dust")) + price));
+                    player.sendMessage(ChatColor.GREEN + "Sold " + sold.getAmount() + " " + capFirst(ItemStackUtils.getAbsoluteId(sold).replace('_', ' ').toLowerCase(Locale.ROOT)) + " for " + ChatColor.RED + price + " " + dustIcon + " dust.");
                     shop = e.getInventory();
                 }else{
                     if(shop.getItem(0).getType().equals(Material.GRAY_STAINED_GLASS_PANE)){
@@ -877,14 +878,14 @@ public class OnInventoryClick implements Listener {
 
 
                     int price = bought.buyItem(qty);
-                    if(Integer.parseInt(pdc.get(player, "dust")) < price){
+                    if(Integer.parseInt(PDCUtils.get(player, "dust")) < price){
                         player.sendMessage(ChatColor.RED + "Not enough dust!");
                         bought.sellItem(qty);
                         return;
                     }
-                    pdc.set(player, "dust", String.valueOf(Integer.parseInt(pdc.get(player, "dust")) - price));
+                    PDCUtils.set(player, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(player, "dust")) - price));
                     giveItem(player, bought.getActualItem(), qty);
-                    player.sendMessage(ChatColor.GREEN + "Bought " + qty + " " + capFirst(getAbsoluteId(clicked).replace('_', ' ').toLowerCase(Locale.ROOT)) + " for " + ChatColor.RED + price + " " + dustIcon + " dust.");
+                    player.sendMessage(ChatColor.GREEN + "Bought " + qty + " " + capFirst(ItemStackUtils.getAbsoluteId(clicked).replace('_', ' ').toLowerCase(Locale.ROOT)) + " for " + ChatColor.RED + price + " " + dustIcon + " dust.");
                 }
                 for(ItemStack addedItem : shop.getContents()){
                     if(addedItem == null){

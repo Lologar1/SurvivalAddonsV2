@@ -1,25 +1,15 @@
 package mc.analyzers.survivaladdons2.events;
 
 import mc.analyzers.survivaladdons2.utility.AttributeUtils;
-import mc.analyzers.survivaladdons2.utility.pdc;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Sound;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
-import java.util.Objects;
 
 import static mc.analyzers.survivaladdons2.utility.AttributeUtils.getVanillaEnchantmentProtectionFactors;
-import static mc.analyzers.survivaladdons2.utility.DamagePlayer.dealDamage;
+import static mc.analyzers.survivaladdons2.utility.PlayerUtils.dealDamage;
 
 public class EntityDamageByBlockEvent implements Listener {
     @EventHandler

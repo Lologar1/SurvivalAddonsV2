@@ -1,13 +1,12 @@
 package mc.analyzers.survivaladdons2;
-import com.iwebpp.crypto.TweetNaclFast;
 import mc.analyzers.survivaladdons2.commands.*;
 import mc.analyzers.survivaladdons2.discord.MessageSendEvent;
 import mc.analyzers.survivaladdons2.events.*;
 import mc.analyzers.survivaladdons2.tasks.CombatTagTick;
 import mc.analyzers.survivaladdons2.tasks.RefreshInventory;
 import mc.analyzers.survivaladdons2.tasks.SyncAttributes;
-import mc.analyzers.survivaladdons2.utility.itemList;
-import mc.analyzers.survivaladdons2.utility.pdc;
+import mc.analyzers.survivaladdons2.utility.ItemList;
+import mc.analyzers.survivaladdons2.utility.PDCUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -15,7 +14,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
@@ -25,15 +23,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 
 import static mc.analyzers.survivaladdons2.quests.Quests.*;
-import static mc.analyzers.survivaladdons2.utility.itemList.item;
-import static mc.analyzers.survivaladdons2.utility.utility.syncItem;
+import static mc.analyzers.survivaladdons2.utility.ItemList.item;
+import static mc.analyzers.survivaladdons2.utility.ItemStackUtils.syncItem;
 
 public final class SurvivalAddons2 extends JavaPlugin {
     private static SurvivalAddons2 plugin;
@@ -94,7 +89,7 @@ public final class SurvivalAddons2 extends JavaPlugin {
 
         HashMap<String, ItemStack> weeklyRare = new HashMap<>();
         ItemStack harvest3 = new ItemStack(Material.ENCHANTED_BOOK);
-        pdc.set(harvest3, "enchantments", "harvest/4");
+        PDCUtils.set(harvest3, "enchantments", "harvest/4");
         syncItem(harvest3);
         weeklyRare.put("Harvest IV Book", harvest3);
         weeklyRare.put("2K dust", new ItemStack(Material.REDSTONE, 2000));
@@ -146,17 +141,17 @@ public final class SurvivalAddons2 extends JavaPlugin {
         this.getCommand("shop").setExecutor(new Shop());
 
         for(Player player : this.getServer().getOnlinePlayers()){
-            if(!pdc.has(player, "dust")){
-                pdc.set(player, "dust", "0");
+            if(!PDCUtils.has(player, "dust")){
+                PDCUtils.set(player, "dust", "0");
             }
-            if(!pdc.has(player, "inCombat")){
-                pdc.set(player, "inCombat", "false/0");
+            if(!PDCUtils.has(player, "inCombat")){
+                PDCUtils.set(player, "inCombat", "false/0");
             }
-            if(!pdc.has(player, "damageValues")){
-                pdc.set(player, "damageValues", "0/0"); //Dealt/Taken
+            if(!PDCUtils.has(player, "damageValues")){
+                PDCUtils.set(player, "damageValues", "0/0"); //Dealt/Taken
             }
-            if(!pdc.has(player, "assist")){
-                pdc.set(player, "assist", " "); //Player's names : Analyzers CarryBit etc.
+            if(!PDCUtils.has(player, "assist")){
+                PDCUtils.set(player, "assist", " "); //Player's names : Analyzers CarryBit etc.
             }
             BukkitTask drainCombatTag = new CombatTagTick(SurvivalAddons2.getPlugin(), player).runTaskLater(SurvivalAddons2.getPlugin(), 20L);
             BukkitTask updateInventory = new SyncAttributes(player, SurvivalAddons2.getPlugin()).runTaskLater(SurvivalAddons2.getPlugin(), 20L);
@@ -209,8 +204,8 @@ public final class SurvivalAddons2 extends JavaPlugin {
         wooden4recipe.setIngredient('w', new RecipeChoice.MaterialChoice(Material.ACACIA_WOOD, Material.BIRCH_WOOD, Material.DARK_OAK_WOOD, Material.JUNGLE_WOOD, Material.MANGROVE_WOOD, Material.OAK_WOOD, Material.SPRUCE_WOOD, Material.STRIPPED_ACACIA_WOOD, Material.STRIPPED_BIRCH_WOOD, Material.STRIPPED_DARK_OAK_WOOD, Material.STRIPPED_JUNGLE_WOOD, Material.STRIPPED_MANGROVE_WOOD, Material.STRIPPED_OAK_WOOD, Material.STRIPPED_SPRUCE_WOOD, Material.ACACIA_LOG, Material.BIRCH_LOG, Material.DARK_OAK_LOG, Material.JUNGLE_LOG, Material.MANGROVE_LOG, Material.OAK_LOG, Material.SPRUCE_LOG));
         getServer().addRecipe(wooden4recipe);
 
-        ItemStack stick = itemList.item("healing_stick");
-        pdc.set(stick, "healing", "1");
+        ItemStack stick = ItemList.item("healing_stick");
+        PDCUtils.set(stick, "healing", "1");
         ArrayList<String> healinglore = new ArrayList<>();
         healinglore.add(ChatColor.GRAY + "Use this item to heal for");
         healinglore.add(ChatColor.RED + "1" + heartIcon + ChatColor.GRAY + ", costing " + ChatColor.RED + "2" + dustIcon + " dust.");
@@ -223,7 +218,7 @@ public final class SurvivalAddons2 extends JavaPlugin {
         getServer().addRecipe(healingStickRecipe);
 
         ItemStack nightvision = new ItemStack(Material.ENCHANTED_BOOK);
-        pdc.set(nightvision, "enchantments", "nightvision/1");
+        PDCUtils.set(nightvision, "enchantments", "nightvision/1");
         ItemMeta nightmeta = nightvision.getItemMeta();
         nightmeta.setDisplayName(net.md_5.bungee.api.ChatColor.of("#481AFD") + "Nightvision Book");
         nightvision.setItemMeta(nightmeta);

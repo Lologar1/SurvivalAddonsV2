@@ -24,16 +24,17 @@ import static java.lang.Double.min;
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.dustIcon;
 import static mc.analyzers.survivaladdons2.SurvivalAddons2.heartIcon;
 import static mc.analyzers.survivaladdons2.quests.Quest.checkQuest;
-import static mc.analyzers.survivaladdons2.utility.DamagePlayer.dealDamage;
+import static mc.analyzers.survivaladdons2.utility.PlayerUtils.dealDamage;
 import static mc.analyzers.survivaladdons2.customenchantments.customEnchantments.lightningEnchantment;
-import static mc.analyzers.survivaladdons2.utility.utility.*;
-import static mc.analyzers.survivaladdons2.utility.utility.giveItem;
+import static mc.analyzers.survivaladdons2.utility.PlayerUtils.giveItem;
+import static mc.analyzers.survivaladdons2.utility.PlayerUtils.hasEffect;
+import static mc.analyzers.survivaladdons2.utility.MiscUtils.*;
 
 public class EntityDamageByEntityEvent implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void EntityDamageByEntityEvent(org.bukkit.event.entity.EntityDamageByEntityEvent e){
-        if(pdc.has(e.getEntity(), "damaged") && pdc.get(e.getEntity(), "damaged").equals("true")){
-            pdc.set(e.getEntity(), "damaged", "false");
+        if(PDCUtils.has(e.getEntity(), "damaged") && PDCUtils.get(e.getEntity(), "damaged").equals("true")){
+            PDCUtils.set(e.getEntity(), "damaged", "false");
             return;
         }
         double finalDamage = e.getDamage();
@@ -46,8 +47,8 @@ public class EntityDamageByEntityEvent implements Listener {
                 double critdamage = 0;
                 double damage = 0;
                 double magicdamage = 0;
-                if(pdc.has(weapon, "attributes") && !(weapon.getType().equals(Material.BOW) || weapon.getType().equals(Material.CROSSBOW))){
-                    String[] attributes = pdc.get(weapon, "attributes").split(" ");
+                if(PDCUtils.has(weapon, "attributes") && !(weapon.getType().equals(Material.BOW) || weapon.getType().equals(Material.CROSSBOW))){
+                    String[] attributes = PDCUtils.get(weapon, "attributes").split(" ");
                     for(String attribute : attributes){
                         switch (attribute.split("/")[0]){
                             case "critchance":
@@ -102,12 +103,12 @@ public class EntityDamageByEntityEvent implements Listener {
                 finalMagicDamage = finalMagicDamage * cd;
                 //CustomEnchants
                 double criticalAddon = 0;
-                if(getCustomEnchantments(weapon).containsKey("critical")){
-                    criticalAddon = ((double) getCustomEnchantments(weapon).get("critical"))/10;
+                if(ItemStackUtils.getCustomEnchantments(weapon).containsKey("critical")){
+                    criticalAddon = ((double) ItemStackUtils.getCustomEnchantments(weapon).get("critical"))/10;
                 }
                 boolean crit = percentChance(critchance/100 + criticalAddon);
-                if(getCustomEnchantments(weapon).containsKey("critical")){
-                    double level = getCustomEnchantments(weapon).get("critical");
+                if(ItemStackUtils.getCustomEnchantments(weapon).containsKey("critical")){
+                    double level = ItemStackUtils.getCustomEnchantments(weapon).get("critical");
                     criticalAddon = level/10;
                 }
                 if(damager.hasPotionEffect(PotionEffectType.INCREASE_DAMAGE)){
@@ -123,23 +124,23 @@ public class EntityDamageByEntityEvent implements Listener {
                     finalMagicDamage += finalMagicDamage * critdamage/100;
                     damaged.getWorld().spawnParticle(Particle.BLOCK_CRACK, damaged.getEyeLocation(), 50, Material.REDSTONE_BLOCK.createBlockData());
                 }
-                if(pdc.has(weapon, "enchantments") && pdc.has(weapon, "attributes")){
+                if(PDCUtils.has(weapon, "enchantments") && PDCUtils.has(weapon, "attributes")){
                     //Custom Enchantsss!!!!
-                    if(getCustomEnchantments(weapon).containsKey(lightningEnchantment.getId())){
-                        if(getCustomEnchantments(weapon).containsKey("venom")){
-                            int level = getCustomEnchantments(weapon).get("venom");
+                    if(ItemStackUtils.getCustomEnchantments(weapon).containsKey(lightningEnchantment.getId())){
+                        if(ItemStackUtils.getCustomEnchantments(weapon).containsKey("venom")){
+                            int level = ItemStackUtils.getCustomEnchantments(weapon).get("venom");
                             if(percentChance(level * 0.25) && crit){
                                 damager.playSound(damager.getLocation(), Sound.ENTITY_SPIDER_HURT, 1, 1);
                                 damaged.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 60*level, 0));
                                 damaged.sendMessage(net.md_5.bungee.api.ChatColor.of("#67D80E") + "" + net.md_5.bungee.api.ChatColor.BOLD + "VENOMED! " + net.md_5.bungee.api.ChatColor.RESET + net.md_5.bungee.api.ChatColor.GRAY + "for " + level*3 + " seconds.");
                             }
                         }
-                        if(getCustomEnchantments(weapon).containsKey("lightning")){
-                            if(!pdc.has(weapon, "lightningCounter")){
-                                pdc.set(weapon, "lightningCounter", "0");
+                        if(ItemStackUtils.getCustomEnchantments(weapon).containsKey("lightning")){
+                            if(!PDCUtils.has(weapon, "lightningCounter")){
+                                PDCUtils.set(weapon, "lightningCounter", "0");
                             }
-                            int counter = Integer.parseInt(pdc.get(weapon, "lightningCounter"));
-                            int level = getCustomEnchantments(weapon).get("lightning");
+                            int counter = Integer.parseInt(PDCUtils.get(weapon, "lightningCounter"));
+                            int level = ItemStackUtils.getCustomEnchantments(weapon).get("lightning");
                             int required = 7 - level;
                             int dmg = level;
                             int dustCost = 0;
@@ -167,15 +168,15 @@ public class EntityDamageByEntityEvent implements Listener {
                             }
                             if(counter >= required){
                                 //PERUN!
-                                if(Integer.parseInt(pdc.get(damager, "dust")) >= dustCost){
+                                if(Integer.parseInt(PDCUtils.get(damager, "dust")) >= dustCost){
                                     double billModif = 0;
-                                    if(getCustomEnchantments(weapon).containsKey("billionaire")){
-                                        billModif = ((double) getCustomEnchantments(weapon).get("billionaire")) * ((double) 1/3);
+                                    if(ItemStackUtils.getCustomEnchantments(weapon).containsKey("billionaire")){
+                                        billModif = ((double) ItemStackUtils.getCustomEnchantments(weapon).get("billionaire")) * ((double) 1/3);
                                     }
                                     damager.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.YELLOW +""+ ChatColor.BOLD + "ZAP! " +ChatColor.RESET + ChatColor.GRAY + "Struck for " +
                                             ChatColor.RED + (dmg/2 * (billModif + 1)) + heartIcon + ChatColor.GRAY + ", cost " + ChatColor.RED + dustCost + " " + dustIcon + " dust."));
-                                    pdc.set(weapon, "lightningCounter", "0");
-                                    pdc.set(damager, "dust", String.valueOf(Integer.parseInt(pdc.get(damager, "dust")) - dustCost));
+                                    PDCUtils.set(weapon, "lightningCounter", "0");
+                                    PDCUtils.set(damager, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(damager, "dust")) - dustCost));
                                     finalMagicDamage += dmg;
                                     damaged.getWorld().strikeLightningEffect(damaged.getLocation());
                                 }else {
@@ -183,22 +184,22 @@ public class EntityDamageByEntityEvent implements Listener {
                                 }
                             }else{
                                 counter++;
-                                pdc.set(weapon, "lightningCounter", String.valueOf(counter));
+                                PDCUtils.set(weapon, "lightningCounter", String.valueOf(counter));
                             }
                         }else{
-                            pdc.set(weapon, "lightningCounter", "1");
+                            PDCUtils.set(weapon, "lightningCounter", "1");
                         }
                     }
-                    if(getCustomEnchantments(weapon).containsKey("venom")){
-                        int level = getCustomEnchantments(weapon).get("venom");
+                    if(ItemStackUtils.getCustomEnchantments(weapon).containsKey("venom")){
+                        int level = ItemStackUtils.getCustomEnchantments(weapon).get("venom");
                         if(percentChance(level*0.25) && crit){
                             damaged.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, level-1));
                             damaged.sendMessage(net.md_5.bungee.api.ChatColor.DARK_GREEN + ""+ net.md_5.bungee.api.ChatColor.BOLD + "POISONED! " + net.md_5.bungee.api.ChatColor.RESET + net.md_5.bungee.api.ChatColor.GRAY + "by " + damager.getDisplayName());
                             damager.playSound(damager.getLocation(), Sound.ENTITY_SPIDER_HURT, 1, 1);
                         }
                     }
-                    if(getCustomEnchantments(weapon).containsKey("netheritestomp") && damaged instanceof Player){
-                        int level = getCustomEnchantments(weapon).get("netheritestomp");
+                    if(ItemStackUtils.getCustomEnchantments(weapon).containsKey("netheritestomp") && damaged instanceof Player){
+                        int level = ItemStackUtils.getCustomEnchantments(weapon).get("netheritestomp");
                         double bonus = 0;
                         for(ItemStack piece : ((Player) damaged).getInventory().getArmorContents()){
                             if(piece != null && (piece.getType().equals(Material.NETHERITE_BOOTS) || piece.getType().equals(Material.NETHERITE_CHESTPLATE) ||
@@ -208,8 +209,8 @@ public class EntityDamageByEntityEvent implements Listener {
                         }
                         finalDamage += finalDamage * bonus;
                     }
-                    if(getCustomEnchantments(weapon).containsKey("gamble")){
-                        int level = getCustomEnchantments(weapon).get("gamble");
+                    if(ItemStackUtils.getCustomEnchantments(weapon).containsKey("gamble")){
+                        int level = ItemStackUtils.getCustomEnchantments(weapon).get("gamble");
                         switch (level){
                             case 1:
                                 finalMagicDamage += finalDamage*0.5;
@@ -233,21 +234,21 @@ public class EntityDamageByEntityEvent implements Listener {
                             damager.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(net.md_5.bungee.api.ChatColor.GREEN + "" + net.md_5.bungee.api.ChatColor.BOLD + "GAMBLE! " + net.md_5.bungee.api.ChatColor.RESET + net.md_5.bungee.api.ChatColor.GRAY + "Lucky!"));
                         }
                     }
-                    if(getCustomEnchantments(weapon).containsKey("billionaire")){
+                    if(ItemStackUtils.getCustomEnchantments(weapon).containsKey("billionaire")){
                         if(damaged instanceof Player && hasEffect((Player) damaged, "golden", true)){
                             damaged.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "GOLDEN! " + ChatColor.RESET + ChatColor.GRAY + "Cancelled " + damager.getDisplayName() + "'s " + ChatColor.GOLD + "billionaire!");
                         }else{
-                            int level = getCustomEnchantments(weapon).get("billionaire");
-                            if((Integer.parseInt(pdc.get(damager, "dust")) >= level*3)){
-                                pdc.set(damager, "dust", String.valueOf(Integer.parseInt(pdc.get(damager, "dust")) - level*3));
+                            int level = ItemStackUtils.getCustomEnchantments(weapon).get("billionaire");
+                            if((Integer.parseInt(PDCUtils.get(damager, "dust")) >= level*3)){
+                                PDCUtils.set(damager, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(damager, "dust")) - level*3));
                                 damager.playSound(damager.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 2);
                                 finalDamage = finalDamage * (1 + Math.round(0.33 * level));
                                 finalMagicDamage = finalMagicDamage * (1 + Math.round(0.33 * level));
                             }
                         }
                     }
-                    if(getCustomEnchantments(weapon).containsKey("lifesteal")){
-                        int level = getCustomEnchantments(weapon).get("lifesteal");
+                    if(ItemStackUtils.getCustomEnchantments(weapon).containsKey("lifesteal")){
+                        int level = ItemStackUtils.getCustomEnchantments(weapon).get("lifesteal");
                         damager.playSound(damager.getLocation(), Sound.ENTITY_PARROT_EAT, 2, 2);
                         damager.setHealth(min(damager.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), damager.getHealth() + 0.05*level*(finalDamage + finalMagicDamage)));
                         finalDamage = finalDamage/2;
@@ -272,9 +273,9 @@ public class EntityDamageByEntityEvent implements Listener {
                 double damage = 0;
                 double magicdamage = 0;
 
-                int powerLevel = Integer.parseInt(pdc.get(arrow, "powerEnchantmentValue"));
+                int powerLevel = Integer.parseInt(PDCUtils.get(arrow, "powerEnchantmentValue"));
 
-                String[] attributes = pdc.get(arrow, "attributeValues").split(" ");
+                String[] attributes = PDCUtils.get(arrow, "attributeValues").split(" ");
                 for(String attribute : attributes){
                     switch (attribute.split("/")[0]){
                         case "critchance":
@@ -293,8 +294,8 @@ public class EntityDamageByEntityEvent implements Listener {
                 }
                 finalMagicDamage = magicdamage;
 
-                if(pdc.has(arrow, "harmingValue")){
-                    int potency = Integer.parseInt(pdc.get(arrow, "harmingValue"));
+                if(PDCUtils.has(arrow, "harmingValue")){
+                    int potency = Integer.parseInt(PDCUtils.get(arrow, "harmingValue"));
                     finalMagicDamage += 2 * potency;
                 }
                 double pita1 = Math.sqrt(Math.pow(velocity.getZ(), 2) + Math.pow(velocity.getY(), 2));
@@ -306,8 +307,8 @@ public class EntityDamageByEntityEvent implements Listener {
 
                 double criticalAddon = 0;
                 float para = 0;
-                if(pdc.has(arrow, "data")) {
-                    String rawData = pdc.get(arrow, "data");
+                if(PDCUtils.has(arrow, "data")) {
+                    String rawData = PDCUtils.get(arrow, "data");
                     String[] modifiers = rawData.split(" ");
                     for (String modifier : modifiers) {
                         if (modifier.equals("") || modifier.equals(" ")) {
@@ -386,8 +387,8 @@ public class EntityDamageByEntityEvent implements Listener {
             if(damager instanceof Player){
                 System.out.println(((Player) damager).getDisplayName() + " dealt " + (finalDamage + finalMagicDamage) + " damage");
                 if(e.getEntity() instanceof Player){
-                    pdc.set(e.getDamager(), "inCombat", "true/15");
-                    pdc.set(e.getEntity(), "inCombat", "true/15");
+                    PDCUtils.set(e.getDamager(), "inCombat", "true/15");
+                    PDCUtils.set(e.getEntity(), "inCombat", "true/15");
                 }
             }
             Player player = (Player) e.getEntity();
@@ -443,22 +444,22 @@ public class EntityDamageByEntityEvent implements Listener {
                 if(entity.getType().equals(EntityType.ENDERMAN)){
                     boolean dropCore = percentChance(0.01 + 0.01 * lootingFactor/2);
                     if(dropCore){
-                        giveItem(killer, itemList.item("ender_core"), 1);
+                        giveItem(killer, ItemList.item("ender_core"), 1);
                         killer.sendMessage(ChatColor.LIGHT_PURPLE + "RARE DROP! " + ChatColor.GRAY + "Ender Core");
                     }
                 }else if(entity.getType().equals(EntityType.SKELETON)){
                     boolean dropCore = percentChance(0.001 + 0.001 * lootingFactor/2);
                     if(dropCore){
-                        giveItem(killer, itemList.item("shortbow_core"), 1);
+                        giveItem(killer, ItemList.item("shortbow_core"), 1);
                         killer.sendMessage(ChatColor.LIGHT_PURPLE + "RARE DROP! " + ChatColor.GRAY + "Shortbow Core");
                     }
                 }else if(entity.getType().equals(EntityType.WARDEN)){
-                    giveItem(killer, itemList.item("warden_heart"), 1);
+                    giveItem(killer, ItemList.item("warden_heart"), 1);
                     killer.sendMessage(ChatColor.LIGHT_PURPLE + "DROP! " + ChatColor.GRAY + "Warden's Heart");
                 }else if(entity.getType().equals(EntityType.WITHER)){
                     boolean dropStar = percentChance(0.3 + 0.03 * lootingFactor/2);
                     if(dropStar){
-                        giveItem(killer, itemList.item("fallen_star"), 1);
+                        giveItem(killer, ItemList.item("fallen_star"), 1);
                         killer.sendMessage(ChatColor.LIGHT_PURPLE + "RARE DROP! " + ChatColor.GRAY + "Fallen Star");
                     }
                 }
