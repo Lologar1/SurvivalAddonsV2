@@ -34,6 +34,7 @@ import static mc.analyzers.survivaladdons2.shop.ShopItem.getByMaterial;
 import static mc.analyzers.survivaladdons2.utility.AttributeUtils.mergeModifiers;
 import static mc.analyzers.survivaladdons2.utility.AttributeUtils.setAttribute;
 import static mc.analyzers.survivaladdons2.customenchantments.customEnchantmentsWrapper.*;
+import static mc.analyzers.survivaladdons2.utility.ItemStackUtils.itemStackBuilder;
 import static mc.analyzers.survivaladdons2.utility.PlayerUtils.giveItem;
 import static mc.analyzers.survivaladdons2.utility.ItemList.item;
 import static mc.analyzers.survivaladdons2.utility.MiscUtils.*;
@@ -683,122 +684,55 @@ public class OnInventoryClick implements Listener {
             }
         }else if(e.getView().getTitle().equals(ChatColor.GRAY + "Quests")){
             e.setCancelled(true);
-            if(e.getSlot() == 11){
+            if(e.getSlot() == 11 || e.getSlot() == 13 || e.getSlot() == 15) {
                 //Hourly
                 boolean alreadyDone = true;
-                if(!PDCUtils.get(player, "hourlyLast").equals("active")){
-                    long lastDid = Long.parseLong(PDCUtils.get(player,"hourlyLast"));
-                    if(lastDid + Quests.hourlyQuest.getDelay() <= System.currentTimeMillis()){
+                String questType = "hourly";
+                if (e.getSlot() == 13) {
+                    questType = "daily";
+                } else if(e.getSlot() == 15){
+                    questType = "weekly";
+                }
+                String questLast = questType + "Last";
+                String activeQuestQuest = "active" + capFirst(questType) + "Quest";
+                String deactivatedQuestQuest = "deactivated" + capFirst(questType) + "Quest";
+                String questQuestProgress = questType + "QuestProgress";
+                Quest hourly = null;
+                try {
+                    hourly = (Quest) Quests.class.getField(questType + "Quest").get(Quests.class);
+                } catch (Exception ignore) {
+                }
+
+                if (!PDCUtils.get(player, questLast).equals("active")) {
+                    long lastDid = Long.parseLong(PDCUtils.get(player, questLast));
+                    if (lastDid + hourly.getDelay() <= System.currentTimeMillis()) {
                         alreadyDone = false;
                     }
                 }
-                if(!PDCUtils.get(player, "activeHourlyQuest").equals("null") || alreadyDone){
+                if (!PDCUtils.get(player, activeQuestQuest).equals("null") || alreadyDone) {
                     player.sendMessage(ChatColor.RED + "Can't do a quest at this time!");
                     return;
                 }
-                if(!PDCUtils.get(player, "currentQuestType").equals("none")){
+                if (!PDCUtils.get(player, "currentQuestType").equals("none")) {
                     String lastType = PDCUtils.get(player, "currentQuestType");
-                    PDCUtils.set(player, lastType + "QuestProgress", "0/1234");
                     PDCUtils.set(player, lastType + "Last", "0");
                     PDCUtils.set(player, "active" + capFirst(lastType) + "Quest", "null");
                 }
-                Quest hourly = Quests.hourlyQuest;
                 String picked = hourly.getRandomQuestId();
-                if(!PDCUtils.get(player, "deactivatedHourlyQuest").equals("null")){
-                    picked = PDCUtils.get(player, "deactivatedHourlyQuest");
+                if (!PDCUtils.get(player, deactivatedQuestQuest).equals("null")) {
+                    picked = PDCUtils.get(player, deactivatedQuestQuest);
                 }
-                ItemStack hourlyQuest = new ItemStack(Material.WRITABLE_BOOK);
-                ItemMeta hourlyMeta = hourlyQuest.getItemMeta();
-                hourlyMeta.setDisplayName(hourly.getPrettyNameFromId(picked));
-                ArrayList<String> hourlyLore = new ArrayList<>();
-                hourlyLore.add(ChatColor.GRAY + "Progress: 0/" + picked.split("/")[1]);
-                hourlyMeta.setLore(hourlyLore);
-                hourlyQuest.setItemMeta(hourlyMeta);
+                int savedProgress = Integer.parseInt(PDCUtils.get(player, questQuestProgress).split("/")[0]);
+                ItemStack hourlyQuest = itemStackBuilder(hourly.getPrettyNameFromId(picked), null, 1, Material.WRITABLE_BOOK,
+                        new String[]{ChatColor.GRAY + "Progress: " + savedProgress + "/" + picked.split("/")[1]});
 
-                PDCUtils.set(player, "hourlyQuestProgress", "0/" + picked.split("/")[1]);
-                PDCUtils.set(player, "activeHourlyQuest", picked);
-                PDCUtils.set(player, "hourlyLast", "active");
-                PDCUtils.set(player, "currentQuestType", "hourly");
-                PDCUtils.set(player, "deactivatedHourlyQuest", picked);
+                PDCUtils.set(player, questQuestProgress, savedProgress + "/" + picked.split("/")[1]);
+                PDCUtils.set(player, activeQuestQuest, picked);
+                PDCUtils.set(player, questLast, "active");
+                PDCUtils.set(player, "currentQuestType", questType);
+                PDCUtils.set(player, deactivatedQuestQuest, picked);
 
-                e.getInventory().setItem(11, hourlyQuest);
-            }else if(e.getSlot()==13){
-                //Daily
-                boolean alreadyDone = true;
-                if(!PDCUtils.get(player, "dailyLast").equals("active")){
-                    long lastDid = Long.parseLong(PDCUtils.get(player,"dailyLast"));
-                    if(lastDid + Quests.dailyQuest.getDelay() <= System.currentTimeMillis()){
-                        alreadyDone = false;
-                    }
-                }
-                if(!PDCUtils.get(player, "activeDailyQuest").equals("null") || alreadyDone){
-                    player.sendMessage(ChatColor.RED + "Can't do a quest at this time!");
-                    return;
-                }
-                if(!PDCUtils.get(player, "currentQuestType").equals("none")){
-                    String lastType = PDCUtils.get(player, "currentQuestType");
-                    PDCUtils.set(player, lastType + "QuestProgress", "0/1234");
-                    PDCUtils.set(player, lastType + "Last", "0");
-                    PDCUtils.set(player, "active" + capFirst(lastType) + "Quest", "null");
-                }
-                Quest daily = Quests.dailyQuest;
-                String picked = daily.getRandomQuestId();
-                if(!PDCUtils.get(player, "deactivatedDailyQuest").equals("null")){
-                    picked = PDCUtils.get(player, "deactivatedDailyQuest");
-                }
-                ItemStack dailyQuest = new ItemStack(Material.WRITABLE_BOOK);
-                ItemMeta dailyMeta = dailyQuest.getItemMeta();
-                dailyMeta.setDisplayName(daily.getPrettyNameFromId(picked));
-                ArrayList<String> dailyLore = new ArrayList<>();
-                dailyLore.add(ChatColor.GRAY + "Progress: 0/" + picked.split("/")[1]);
-                dailyMeta.setLore(dailyLore);
-                dailyQuest.setItemMeta(dailyMeta);
-
-                PDCUtils.set(player, "dailyQuestProgress", "0/" + picked.split("/")[1]);
-                PDCUtils.set(player, "activeDailyQuest", picked);
-                PDCUtils.set(player, "dailyLast", "active");
-                PDCUtils.set(player, "currentQuestType", "daily");
-                PDCUtils.set(player, "deactivatedDailyQuest", picked);
-
-                e.getInventory().setItem(13, dailyQuest);
-            }else if(e.getSlot()==15){
-                //Weekly
-                boolean alreadyDone = true;
-                if(!PDCUtils.get(player, "weeklyLast").equals("active")){
-                    long lastDid = Long.parseLong(PDCUtils.get(player,"weeklyLast"));
-                    if(lastDid + Quests.weeklyQuest.getDelay() <= System.currentTimeMillis()){
-                        alreadyDone = false;
-                    }
-                }
-                if(!PDCUtils.get(player, "activeWeeklyQuest").equals("null") || alreadyDone){
-                    player.sendMessage(ChatColor.RED + "Can't do a quest at this time!");
-                    return;
-                }
-                if(!PDCUtils.get(player, "currentQuestType").equals("none")){
-                    String lastType = PDCUtils.get(player, "currentQuestType");
-                    PDCUtils.set(player, lastType + "Last", "0");
-                    PDCUtils.set(player, "active" + capFirst(lastType) + "Quest", "null");
-                }
-                Quest weekly = Quests.weeklyQuest;
-                String picked = weekly.getRandomQuestId();
-                if(!PDCUtils.get(player, "deactivatedWeeklyQuest").equals("null")){
-                    picked = PDCUtils.get(player, "deactivatedWeeklyQuest");
-                }
-                ItemStack weeklyQuest = new ItemStack(Material.WRITABLE_BOOK);
-                ItemMeta weeklyMeta = weeklyQuest.getItemMeta();
-                weeklyMeta.setDisplayName(weekly.getPrettyNameFromId(picked));
-                ArrayList<String> weeklyLore = new ArrayList<>();
-                weeklyLore.add(ChatColor.GRAY + "Progress: 0/" + picked.split("/")[1]);
-                weeklyMeta.setLore(weeklyLore);
-                weeklyQuest.setItemMeta(weeklyMeta);
-
-                PDCUtils.set(player, "weeklyQuestProgress", "0/" + picked.split("/")[1]);
-                PDCUtils.set(player, "activeWeeklyQuest", picked);
-                PDCUtils.set(player, "weeklyLast", "active");
-                PDCUtils.set(player, "currentQuestType", "weekly");
-                PDCUtils.set(player, "deactivatedWeeklyQuest", picked);
-
-                e.getInventory().setItem(15, weeklyQuest);
+                e.getInventory().setItem(e.getSlot(), hourlyQuest);
             }
         }else if(e.getView().getTitle().equals(ChatColor.GRAY + "Shop")){
             e.setCancelled(true);

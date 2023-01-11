@@ -335,8 +335,10 @@ public class ItemStackUtils {
             meta.setLore(lore);
         }
         item.setItemMeta(meta);
-        for(String pdc : PDCs.split(" ")){
-            PDCUtils.set(item, pdc.split("/")[0], pdc.split("/")[1]);
+        if(!(PDCs == null)){
+            for(String pdc : PDCs.split(" ")){
+                PDCUtils.set(item, pdc.split("/")[0], pdc.split("/")[1]);
+            }
         }
         return item;
     }

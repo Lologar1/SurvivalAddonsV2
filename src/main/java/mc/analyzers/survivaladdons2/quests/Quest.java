@@ -100,10 +100,6 @@ public class Quest {
         this.commonRewards = commonRewards;
     }
 
-    public void setCommonPercent(double commonPercent) {
-        this.commonPercent = commonPercent;
-    }
-
     public void setRareRewards(HashMap<String, ItemStack> rareRewards) {
         this.rareRewards = rareRewards;
     }
