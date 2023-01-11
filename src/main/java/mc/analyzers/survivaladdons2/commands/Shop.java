@@ -35,6 +35,7 @@ public class Shop implements CommandExecutor {
         ItemStack mining = new ItemStack(Material.IRON_PICKAXE);
         ItemMeta miningMeta = mining.getItemMeta();
         miningMeta.setDisplayName(ChatColor.GREEN + "Mining");
+        miningMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES); //hides the description
         mining.setItemMeta(miningMeta);
 
         ItemStack mob = new ItemStack(Material.ROTTEN_FLESH);
