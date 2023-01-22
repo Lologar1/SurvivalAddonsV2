@@ -84,7 +84,7 @@ public final class SurvivalAddons2 extends JavaPlugin {
         weeklyCommon.put("64 diamonds", new ItemStack(Material.DIAMOND, 64));
         weeklyCommon.put("3 netherite ingots", new ItemStack(Material.NETHERITE_INGOT, 3));
         feathers.setAmount(10);
-        weeklyCommon.put("10 funky feathers", feathers);
+        weeklyCommon.put("10 funky feathers", new ItemStack(feathers));
         weeklyQuest.setCommonRewards(weeklyCommon);
 
         HashMap<String, ItemStack> weeklyRare = new HashMap<>();
@@ -95,7 +95,7 @@ public final class SurvivalAddons2 extends JavaPlugin {
         weeklyRare.put("2K dust", new ItemStack(Material.REDSTONE, 2000));
         weeklyRare.put("2.5K dust", new ItemStack(Material.REDSTONE, 2500));
         feathers.setAmount(25);
-        weeklyRare.put("25 funky feathers", feathers);
+        weeklyRare.put("25 funky feathers", new ItemStack(feathers));
         weeklyRare.put("4 netherite ingots", new ItemStack(Material.NETHERITE_INGOT, 4));
         weeklyQuest.setRareRewards(weeklyRare);
 
@@ -119,7 +119,7 @@ public final class SurvivalAddons2 extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new onProjectileFire(), this);
         getServer().getPluginManager().registerEvents(new EntityDamageByEntityEvent(), this);
         getServer().getPluginManager().registerEvents(new onEntityDeath(), this);
-        getServer().getPluginManager().registerEvents(new onBlockMine(), this);
+        getServer().getPluginManager().registerEvents(new OnBlockDropItem(), this);
         getServer().getPluginManager().registerEvents(new EntityDamageByBlockEvent(), this);
         getServer().getPluginManager().registerEvents(new OnPlayerCraft(), this);
         getServer().getPluginManager().registerEvents(new OnPlayerEat(), this);

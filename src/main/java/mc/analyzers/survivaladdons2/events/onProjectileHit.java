@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -18,7 +19,7 @@ import static mc.analyzers.survivaladdons2.SurvivalAddons2.dustIcon;
 public class onProjectileHit implements Listener {
     @EventHandler
     public void onArrowHit(ProjectileHitEvent e){
-        if(e.getEntity().getShooter() instanceof HumanEntity && e.getEntity() instanceof AbstractArrow){
+        if(e.getEntity().getShooter() instanceof HumanEntity && e.getEntity() instanceof AbstractArrow && !(e.getEntity() instanceof Trident)){
             Player player = (Player) e.getEntity().getShooter();
             AbstractArrow arrow = (AbstractArrow)  e.getEntity();
             Location playerLocation = player.getLocation();

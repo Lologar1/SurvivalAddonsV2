@@ -12,7 +12,7 @@ public class ShopItems {
     public static final ShopItem gold_ingot = new ShopItem(new ItemStack(Material.GOLD_INGOT), 16, 6, true, "mining");
     public static final ShopItem diamond = new ShopItem(new ItemStack(Material.DIAMOND), 16, 35, true, "mining");
     public static final ShopItem netherite_scrap = new ShopItem(new ItemStack(Material.NETHERITE_SCRAP), 8, 175, true, "mining");
-    public static final ShopItem bedrock = new ShopItem(new ItemStack(Material.BEDROCK), 1000, 100000, true, "other");
+    //public static final ShopItem bedrock = new ShopItem(new ItemStack(Material.BEDROCK), 1000, 100000, true, "other");
     public static final ShopItem coal = new ShopItem(new ItemStack(Material.COAL), 16, 2, true, "mining");
     public static final ShopItem bone = new ShopItem(new ItemStack(Material.BONE), 32, 2, true, "mob");
     public static final ShopItem rotten_flesh = new ShopItem(new ItemStack(Material.ROTTEN_FLESH), 32, 2, true, "mob");
@@ -37,11 +37,10 @@ public class ShopItems {
     public static final ShopItem spruce_log = new ShopItem(new ItemStack(Material.SPRUCE_LOG), 8, 3, true, "blocks");
     public static final ShopItem birch_log = new ShopItem(new ItemStack(Material.BIRCH_LOG), 8, 3, true, "blocks");
     public static final ShopItem phantom_membrane = new ShopItem(new ItemStack(Material.PHANTOM_MEMBRANE), 16, 2, true, "mob");
-    public static final ShopItem golden_apple = new ShopItem(new ItemStack(Material.GOLDEN_APPLE), 8, 9, true, "other");
-    public static final ShopItem golden_carrot = new ShopItem(new ItemStack(Material.GOLDEN_CARROT), 8, 9, true, "other");
+    public static final ShopItem golden_apple = new ShopItem(new ItemStack(Material.GOLDEN_APPLE), 16, 9, true, "other");
+    public static final ShopItem golden_carrot = new ShopItem(new ItemStack(Material.GOLDEN_CARROT), 32, 9, true, "other");
     public static final ShopItem funky_feather = new ShopItem(item("funky_feather"), 16, 80, true, "other");
-    public static final ShopItem obsidian = new ShopItem(new ItemStack(Material.OBSIDIAN), 16, 4, true, "building");
-    public static final ShopItem sand = new ShopItem(new ItemStack(Material.SAND), 16, 2, true, "building");
+    public static final ShopItem obsidian = new ShopItem(new ItemStack(Material.OBSIDIAN), 16, 4, true, "blocks");
     public static final ShopItem shulker_shell = new ShopItem(new ItemStack(Material.SHULKER_SHELL), 4, 20, true, "other");
     public static final ShopItem stock_of_stonks = new ShopItem(item("stock_of_stonks"), 1, 1, true, "other");
     public static final ShopItem potato = new ShopItem(new ItemStack(Material.POTATO), 32, 2, true, "farming");
@@ -55,6 +54,7 @@ public class ShopItems {
     public static final ShopItem arrow = new ShopItem(new ItemStack(Material.ARROW), 64, 1, true, "other");
     public static final ShopItem firework_rocket = new ShopItem(new ItemStack(Material.FIREWORK_ROCKET), 256, 2, true, "other");
 
+    public static final ShopItem sand = new ShopItem(new ItemStack(Material.SAND), 10000000, 2, false, "blocks");
     public static final ShopItem lava_bucket = new ShopItem(new ItemStack(Material.LAVA_BUCKET), 10000000, 4, false, "other");
     public static final ShopItem water_bucket = new ShopItem(new ItemStack(Material.WATER_BUCKET), 10000000, 4, false, "other");
     public static final ShopItem dirt = new ShopItem(new ItemStack(Material.DIRT), 10000000, 1, false, "blocks");

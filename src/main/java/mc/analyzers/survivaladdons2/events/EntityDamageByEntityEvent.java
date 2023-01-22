@@ -71,6 +71,9 @@ public class EntityDamageByEntityEvent implements Listener {
                     finalDamage=0.5;
                 }
                 double sharpnessFactor;
+                if(!(e.getEntity() instanceof LivingEntity)){
+                    return;
+                }
                 LivingEntity damaged = (LivingEntity) e.getEntity();
                 if(weapon.getEnchantments().containsKey(Enchantment.DAMAGE_ALL)){
                     sharpnessFactor = 0.5 * max(0, weapon.getEnchantmentLevel(Enchantment.DAMAGE_ALL) - 1) + 0.5;

@@ -88,7 +88,7 @@ public class ShopItem {
         plugin.getConfig().set("shop." + type + ".bias", oldBias);
         plugin.getConfig().set("shop." + type + ".offset", offset);
         plugin.saveConfig();
-        return Math.max(1, dustPrice);
+        return Math.max(amount, dustPrice);
     }
 
     public String getCategory() {

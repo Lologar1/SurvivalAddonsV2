@@ -145,9 +145,9 @@ public class ItemList {
         icewandmeta.setDisplayName(net.md_5.bungee.api.ChatColor.of("#68FBFB") + "Ice " + ChatColor.of("#27FBE2") + "Spray " + ChatColor.of("#10FB44") + "Wand");
         ArrayList<String> icewandlore = new ArrayList<>();
         icewandlore.add(ChatColor.YELLOW + "" + ChatColor.YELLOW + "Right-click" + ChatColor.RESET + ChatColor.GRAY + " to summon an " + ChatColor.of("#68FBFB") + "ice explosion");
-        icewandlore.add(ChatColor.GRAY + "in front of you, dealing " + ChatColor.AQUA + "7 Magic damage " + ChatColor.GRAY + "and");
-        icewandlore.add(ChatColor.GRAY + "applying " + ChatColor.RED + "Slowness I " + ChatColor.GRAY + ("for 10s. (costs ") + ChatColor.RED + "3 " + dustIcon + " dust)");
-        icewandlore.add(ChatColor.GRAY + "(10s cooldown)");
+        icewandlore.add(ChatColor.GRAY + "in front of you, dealing " + ChatColor.AQUA + "11 Magic damage " + ChatColor.GRAY + "and");
+        icewandlore.add(ChatColor.GRAY + "applying " + ChatColor.RED + "Slowness I " + ChatColor.GRAY + ("for 10s. (costs ") + ChatColor.RED + "4 " + dustIcon + " dust)");
+        icewandlore.add(ChatColor.GRAY + "(3s cooldown)");
         icewandmeta.setLore(icewandlore);
         icewand.setItemMeta(icewandmeta);
 

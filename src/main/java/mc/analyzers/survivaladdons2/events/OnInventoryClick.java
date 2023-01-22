@@ -215,7 +215,7 @@ public class OnInventoryClick implements Listener {
                     if (Integer.parseInt(PDCUtils.get(player, "dust")) >= dustCost && anvil.getItem(24) != null) {
                         PDCUtils.set(player, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(player, "dust")) - dustCost));
                         player.sendMessage(ChatColor.GREEN + "Successfully combined for " + ChatColor.RED + dustCost + dustIcon + " dust.");
-
+                        checkQuest("combine", "item", player, 1);
                         anvil.getItem(20).setAmount(anvil.getItem(20).getAmount() - 1);
                         anvil.getItem(22).setAmount(anvil.getItem(22).getAmount() - 1);
                         player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1, 1);
@@ -257,7 +257,7 @@ public class OnInventoryClick implements Listener {
             if (!(e.getSlot() == 11 || e.getClickedInventory().getType().equals(InventoryType.PLAYER))) {
                 e.setCancelled(true);
             }
-            if (e.getSlot() == 15) {
+            if (e.getSlot() == 15 && !e.getInventory().getType().equals(InventoryType.PLAYER)) {
                 //Reroll
                 if (!(Integer.parseInt(PDCUtils.get(player, "dust")) >= 2)) {
                     player.sendMessage(ChatColor.RED + "Not enough dust!");
@@ -378,7 +378,7 @@ public class OnInventoryClick implements Listener {
                     player.sendMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "TOME! " + ChatColor.GOLD + getById(pickedEnchant).getPrettyname());
                     player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
                 }
-            } else if (e.getSlot() == 22) {
+            } else if (e.getSlot() == 22 && !e.getInventory().getType().equals(InventoryType.PLAYER)) {
                 //Buying the enchantment
                 if(tome.getItem(22) == null || tome.getItem(22).getType().equals(Material.BARRIER)){
                     return;
@@ -822,6 +822,9 @@ public class OnInventoryClick implements Listener {
                     player.sendMessage(ChatColor.GREEN + "Bought " + qty + " " + capFirst(ItemStackUtils.getAbsoluteId(clicked).replace('_', ' ').toLowerCase(Locale.ROOT)) + " for " + ChatColor.RED + price + " " + dustIcon + " dust.");
                 }
                 for(ItemStack addedItem : shop.getContents()){
+                    if(addedItem.getType().equals(Material.GRAY_STAINED_GLASS_PANE)){
+                        break;
+                    }
                     if(addedItem == null){
                         continue;
                     }

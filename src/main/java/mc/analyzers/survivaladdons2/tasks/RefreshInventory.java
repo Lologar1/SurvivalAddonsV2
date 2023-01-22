@@ -25,9 +25,6 @@ public class RefreshInventory extends BukkitRunnable {
             if(grindedItem == null || !SyncAttributes.materialAttributes.containsKey(ItemStackUtils.getAbsoluteIdMaterial(grindedItem))){
                 continue;
             }else{
-                try{
-                    ItemStackUtils.syncItem(grindedItem);
-                }catch (Exception ignored){};
                 String[] rawAttributes = SyncAttributes.materialAttributes.get(ItemStackUtils.getAbsoluteIdMaterial(grindedItem)).split(" ");
                 PDCUtils.set(grindedItem, "attributes", "");
                 for(String rawAttribute : rawAttributes){
@@ -41,7 +38,9 @@ public class RefreshInventory extends BukkitRunnable {
                 ItemStack modif = item(PDCUtils.get(grindedItem, "currentAttributeModifier"));
                 mergeModifiers(grindedItem, modif);
             }
-            ItemStackUtils.syncItem(grindedItem);
+            try{
+                ItemStackUtils.syncItem(grindedItem);
+            }catch (Exception ignored){};
         }
         if(SurvivalAddons2.getPlugin().getServer().getOnlinePlayers().contains(player)){
             BukkitTask refreshPlayer = new RefreshInventory(player).runTaskLater(SurvivalAddons2.getPlugin(), 750L);

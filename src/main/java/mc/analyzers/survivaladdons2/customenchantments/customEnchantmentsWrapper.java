@@ -39,7 +39,7 @@ public class customEnchantmentsWrapper {
     public static String[] uncommonEnchantments = new String[]{"lightning", "venom", "bountiful", "gamble"};
     public static String[] rareEnchantments = new String[]{"netheritestomp", "ftts", "sorcery"};
     public static String[] epicEnchantments = new String[]{"lifesteal", "billionaire", "parasite"};
-    public static String[] legendaryEnchantments = new String[]{"glasscannon", "critical"}; //add smelt
+    public static String[] legendaryEnchantments = new String[]{"glasscannon", "critical", "smelt"}; //add smelt
 
     public static customEnchantmentsWrapper getById(String id){
         try {

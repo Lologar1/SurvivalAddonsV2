@@ -196,8 +196,8 @@ public class PlayerInteractEvent implements Listener {
                         }
                         if((System.currentTimeMillis()/1000 - tpCooldown) >= 5){
                             PDCUtils.set(player, "stickCooldown", String.valueOf(System.currentTimeMillis()/1000));
-                            player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "EAT! " + ChatColor.RESET + ChatColor.GRAY + "for " + potency*6 + " satruation.");
-                            player.setFoodLevel(min(player.getFoodLevel() + potency*6, 20));
+                            player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "EAT! " + ChatColor.RESET + ChatColor.GRAY + "for " + potency*2 + " satruation.");
+                            player.setFoodLevel(min(player.getFoodLevel() + potency*2, 20));
                             player.setSaturation(2);
                             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_BURP, 1, 1);
                             PDCUtils.set(player, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(player, "dust")) - potency));
@@ -209,11 +209,11 @@ public class PlayerInteractEvent implements Listener {
                     break;
                 case "fling_stick":
                     potency = Integer.parseInt(PDCUtils.get(item, "fling"));
-                    if(e.getAction().equals(Action.LEFT_CLICK_AIR)){
+                    if(e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)){
                         Vector velo = player.getVelocity();
                         velo.setY(velo.getY() + 2);
                         player.setVelocity(velo);
-                    }else if(e.getAction().equals(Action.RIGHT_CLICK_AIR)){
+                    }else if(e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)){
                         player.setVelocity(player.getLocation().getDirection().multiply(potency));
                     }
                     break;
@@ -222,18 +222,18 @@ public class PlayerInteractEvent implements Listener {
                     if(PDCUtils.has(player, "wandCooldown")){
                         tpCooldown = Integer.parseInt(PDCUtils.get(player, "wandCooldown"));
                     }
-                    if((System.currentTimeMillis()/1000 - tpCooldown) >= 10){
-                        if(Integer.parseInt(PDCUtils.get(player, "dust")) >= 3){
-                            PDCUtils.set(player, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(player, "dust")) - 3));
+                    if((System.currentTimeMillis()/1000 - tpCooldown) >= 3){
+                        if(Integer.parseInt(PDCUtils.get(player, "dust")) >= 4){
+                            PDCUtils.set(player, "dust", String.valueOf(Integer.parseInt(PDCUtils.get(player, "dust")) - 4));
                         }else {
                             return;
                         }
                         PDCUtils.set(player, "wandCooldown", String.valueOf(System.currentTimeMillis()/1000));
-                        player.sendMessage(net.md_5.bungee.api.ChatColor.of("#68FBFB") + "" + ChatColor.BOLD + "MAGIC! " + ChatColor.RESET + ChatColor.GRAY + "cost " + net.md_5.bungee.api.ChatColor.RED + " 3 " + dustIcon + " dust.");
+                        player.sendMessage(net.md_5.bungee.api.ChatColor.of("#68FBFB") + "" + ChatColor.BOLD + "MAGIC! " + ChatColor.RESET + ChatColor.GRAY + "cost " + net.md_5.bungee.api.ChatColor.RED + " 4 " + dustIcon + " dust.");
                         //Code for ice spray wand
-                        player.getWorld().spawnParticle(Particle.CLOUD, player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(2)), 40, 0, 0, 0, 0.5);
+                        player.getWorld().spawnParticle(Particle.CLOUD, player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(2.5)), 40, 0, 0, 0, 0.5);
                         player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1, 1);
-                        Collection<Entity> affected = player.getWorld().getNearbyEntities(player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(2)), 2, 2, 2);
+                        Collection<Entity> affected = player.getWorld().getNearbyEntities(player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(2.5)), 4, 4, 4);
                         for(Entity toDamage : affected){
                             if(!toDamage.getType().isAlive() || toDamage.equals(player)){
                                 continue;
@@ -242,14 +242,14 @@ public class PlayerInteractEvent implements Listener {
                             if(toDamage instanceof Player){
                                 //Magic Damage
                                 toDamage.sendMessage(net.md_5.bungee.api.ChatColor.of("#5F602D") + "" + ChatColor.BOLD + "SLOW!" + ChatColor.RESET + ChatColor.GRAY + " For 10 seconds because of " + ChatColor.BLUE + player.getDisplayName());
-                                PlayerUtils.dealDamage((Player) toDamage, 0, 7, EntityDamageEvent.DamageCause.MAGIC);
+                                PlayerUtils.dealDamage((Player) toDamage, 0, 11, EntityDamageEvent.DamageCause.MAGIC);
                             }else {
                                 //Normal damage
-                                ((LivingEntity) toDamage).damage(7, player);
+                                ((LivingEntity) toDamage).damage(11, player);
                             }
                         }
                     }else{
-                        String remaining = String.valueOf(10 - (System.currentTimeMillis()/1000 - Integer.parseInt(PDCUtils.get(player, "wandCooldown"))));
+                        String remaining = String.valueOf(3 - (System.currentTimeMillis()/1000 - Integer.parseInt(PDCUtils.get(player, "wandCooldown"))));
                         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Wand Cooldown! " + ChatColor.GRAY + "(" + remaining + "s)"));
                     }
                     break;

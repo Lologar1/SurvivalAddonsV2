@@ -56,7 +56,7 @@ public class getItem implements CommandExecutor {
                 PDCUtils.set(stick, "food", args[2]);
                 ArrayList<String> foodlore = new ArrayList<>();
                 foodlore.add(ChatColor.GRAY + "Use this item to satiate for");
-                foodlore.add(ChatColor.GOLD + String.valueOf(Integer.parseInt(args[2])*6) + " saturation" + ChatColor.GRAY + ", costing " + ChatColor.RED + args[2] + dustIcon + " dust.");
+                foodlore.add(ChatColor.GOLD + String.valueOf(Integer.parseInt(args[2])*2) + " saturation" + ChatColor.GRAY + ", costing " + ChatColor.RED + args[2] + dustIcon + " dust.");
                 ItemMeta foodmeta = stick.getItemMeta();
                 foodmeta.setLore(foodlore);
                 stick.setItemMeta(foodmeta);

@@ -60,8 +60,9 @@ public class PlayerUtils {
             player.setHealth(20);
             player.setSaturation(20);
             player.setFoodLevel(20);
-            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 500, 5));
             player.getInventory().clear();
+            player.getActivePotionEffects().clear();
+
             if(player.getBedSpawnLocation() != null){
                 player.teleport(player.getBedSpawnLocation());
             }else{
@@ -143,9 +144,8 @@ public class PlayerUtils {
             case ENTITY_EXPLOSION:
                 totalFinalDamage = totalFinalDamage - totalFinalDamage * getVanillaEnchantmentProtectionFactors(player)[2]/100;
                 break;
-            default:
-                totalFinalDamage = totalFinalDamage - totalFinalDamage * getVanillaEnchantmentProtectionFactors(player)[0]/100;
         }
+        totalFinalDamage = totalFinalDamage - totalFinalDamage * getVanillaEnchantmentProtectionFactors(player)[0]/100;
         if(player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)){
             totalFinalDamage = totalFinalDamage - totalFinalDamage * (0.15 * (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier()+1));
         }
@@ -205,14 +205,17 @@ public class PlayerUtils {
     }
 
     public static void sendActionBarMessage(Player player, String message){
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message  ));
     }
 
     public static void damageArmor(double totalFinalDamage, Player player){
         int toDeplete = (int) max((totalFinalDamage/4), 1);
         int iterator = 0;
         for(ItemStack piece : player.getInventory().getArmorContents()){
-            if(piece != null && piece.getType().equals(Material.ELYTRA)){
+            if(piece == null){
+                continue;
+            }
+            if(piece.getType().equals(Material.ELYTRA) || piece.getType().equals(Material.PLAYER_HEAD)){
                 continue;
             }
             double unbreakingFactor = 0;
@@ -232,7 +235,7 @@ public class PlayerUtils {
                     }
                 }
             }catch (Exception ignored){}
-            if(!(piece == null) && piece.getItemMeta() instanceof Damageable && !percentChance(unbreakingFactor)){
+            if(piece.getItemMeta() instanceof Damageable && !percentChance(unbreakingFactor)){
                 Damageable meta = (Damageable) piece.getItemMeta();
                 meta.setDamage(meta.getDamage() + toDeplete);
                 if(meta.getDamage() >= piece.getType().getMaxDurability()){
